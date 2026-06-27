@@ -18,6 +18,21 @@ export default {
 
             // ── Brand Colour Palette ─────────────────────────────────────
             colors: {
+                portal: {
+                    ink: '#012d1d',
+                    container: '#1b4332',
+                    secondary: '#2c694e',
+                    'secondary-fixed': '#b1f0ce',
+                    'on-secondary-container': '#316e52',
+                    'leaf-tint': '#D8F3DC',
+                    surface: '#f8f9fa',
+                    'surface-bright': '#f8f9fa',
+                    'on-surface': '#191c1d',
+                    'on-surface-variant': '#414844',
+                    'on-primary-container': '#86af99',
+                    'outline-variant': '#c1c8c2',
+                    'secondary-container': '#aeeecb',
+                },
                 primary: {
                     DEFAULT:  '#5E8B3D',   // Primary Green
                     dark:     '#3F6B2A',   // Dark Green Accent
@@ -45,6 +60,19 @@ export default {
                 card: '1.5rem',   // --radius-card
                 btn:  '50px',     // --radius-btn
                 icon: '14px',
+            },
+
+            fontSize: {
+                'portal-xl': ['48px', { lineHeight: '56px', letterSpacing: '-0.02em', fontWeight: '700' }],
+                'portal-lg': ['32px', { lineHeight: '40px', letterSpacing: '-0.01em', fontWeight: '700' }],
+                'portal-md': ['24px', { lineHeight: '32px', fontWeight: '600' }],
+                'portal-body-lg': ['18px', { lineHeight: '28px', fontWeight: '400' }],
+            },
+
+            spacing: {
+                'portal-gutter': '24px',
+                'portal-margin-mobile': '16px',
+                'portal-margin-desktop': '48px',
             },
 
             // ── Box Shadows ───────────────────────────────────────────────
@@ -86,6 +114,7 @@ export default {
             // ── Max-width ─────────────────────────────────────────────────
             maxWidth: {
                 site: '1200px',
+                'portal-container': '1280px',
             },
 
             // ── Backdrop Blur ─────────────────────────────────────────────

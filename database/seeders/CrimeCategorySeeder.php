@@ -2,28 +2,31 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Crime;
 use Illuminate\Database\Seeder;
 
 class CrimeCategorySeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Seeds the CRIME table with common environmental crime categories.
      */
     public function run(): void
     {
-        $categories = [
-            ['name' => 'Illegal Logging', 'description' => 'Unauthorized cutting of trees'],
-            ['name' => 'Wetland Encroachment', 'description' => 'Building on or draining wetlands'],
-            ['name' => 'Illegal Mining', 'description' => 'Mining without permits'],
-            ['name' => 'Illegal Dumping', 'description' => 'Dumping waste in prohibited areas'],
-            ['name' => 'Water Pollution', 'description' => 'Contaminating water bodies'],
-            ['name' => 'Air Pollution', 'description' => 'Illegal emission of pollutants'],
-            ['name' => 'Wildlife Trafficking', 'description' => 'Illegal trade of wild animals'],
+        $crimes = [
+            ['category_name' => 'Illegal Logging',       'description' => 'Unauthorized cutting of trees',          'severity_level' => 'High'],
+            ['category_name' => 'Wetland Encroachment',  'description' => 'Building on or draining wetlands',       'severity_level' => 'High'],
+            ['category_name' => 'Illegal Mining',        'description' => 'Mining without permits',                 'severity_level' => 'Critical'],
+            ['category_name' => 'Illegal Dumping',       'description' => 'Dumping waste in prohibited areas',      'severity_level' => 'Medium'],
+            ['category_name' => 'Water Pollution',       'description' => 'Contaminating water bodies',             'severity_level' => 'High'],
+            ['category_name' => 'Air Pollution',         'description' => 'Illegal emission of pollutants',         'severity_level' => 'Medium'],
+            ['category_name' => 'Wildlife Trafficking',  'description' => 'Illegal trade of wild animals',          'severity_level' => 'Critical'],
         ];
-        foreach ($categories as $cat) {
-            \App\Models\CrimeCategory::create($cat);
+
+        foreach ($crimes as $crime) {
+            Crime::create($crime);
         }
-        echo "Crime categories seeded successfully\n";
+
+        $this->command?->info('Crime records seeded successfully.');
     }
 }

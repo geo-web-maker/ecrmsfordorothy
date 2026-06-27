@@ -1,9 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <p class="text-xs font-bold uppercase tracking-wider" style="color:#5E8B3D;">{{ Auth::user()->role === 'admin' ? 'Admin Portal' : 'Officer Portal' }}</p>
+            <p class="text-xs font-bold uppercase tracking-wider" style="color:#5E8B3D;">{{ Auth::user()->isAdmin() ? 'Admin Portal' : 'Officer Portal' }}</p>
             <h2 class="mt-1 text-2xl font-bold" style="color:#1F3318;">
-                {{ Auth::user()->role === 'admin' ? 'All Reports' : 'My Assigned Reports' }}
+                {{ Auth::user()->isAdmin() ? 'All Reports' : 'My Assigned Reports' }}
             </h2>
             <p class="mt-1 text-sm" style="color:#5F6B57;">
                 Browse, filter, and take action on submitted environmental crime reports.

@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="is-loading">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Submit Crime Report — {{ config('app.name', 'ECRMS') }}</title>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    @include('partials.optimized-head')
 
     <style>
         #crime-map { height: 380px; border-radius: 0.75rem; z-index: 0; }
@@ -19,6 +18,8 @@
     </style>
 </head>
 <body class="bg-[#F6F6EE] font-sans text-[#1F2A1C] antialiased">
+@include('partials.page-skeleton')
+<div class="page-content">
     <nav class="bg-[#2C4424] text-white shadow-sm sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -92,16 +93,16 @@
 
                     {{-- Step 1: Category --}}
                     <div class="step-pane active" data-step="1">
-                        <label for="crime_category_id" class="block text-sm font-semibold text-[#1F3318] mb-2">Crime category <span class="text-red-600">*</span></label>
-                        <select name="crime_category_id" id="crime_category_id" class="w-full px-4 py-3 text-base border border-[#D8DECB] rounded-xl @error('crime_category_id') border-red-400 @enderror focus:border-[#2C4424] focus:ring-2 focus:ring-[#2C4424]/20 outline-none transition" required>
+                        <label for="crime_id" class="block text-sm font-semibold text-[#1F3318] mb-2">Crime category <span class="text-red-600">*</span></label>
+                        <select name="crime_id" id="crime_id" class="w-full px-4 py-3 text-base border border-[#D8DECB] rounded-xl @error('crime_id') border-red-400 @enderror focus:border-[#2C4424] focus:ring-2 focus:ring-[#2C4424]/20 outline-none transition" required>
                             <option value="">— Select a category —</option>
                             @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" @selected(old('crime_category_id') == $category->id)>
-                                    {{ $category->name }}
+                                <option value="{{ $category->crime_id }}" @selected(old('crime_id') == $category->crime_id)>
+                                    {{ $category->category_name }}
                                 </option>
                             @endforeach
                         </select>
-                        @error('crime_category_id')
+                        @error('crime_id')
                             <div class="text-red-600 text-sm mt-2">{{ $message }}</div>
                         @enderror
                         <div class="text-[#6B7568] text-sm mt-3">Choose the type of environmental violation you are reporting.</div>
@@ -126,7 +127,10 @@
                             <svg class="h-4 w-4 text-[#3F5C34]" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a6 6 0 0 0-6 6c0 4.2 6 10 6 10s6-5.8 6-10a6 6 0 0 0-6-6zm0 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" clip-rule="evenodd" /></svg>
                             Click the map or drag the marker to set the incident location.
                         </p>
-                        <div id="crime-map" class="border border-[#D8DECB] mb-4"></div>
+                        <div class="async-panel mb-4" id="crime-map-panel">
+                            <x-skeleton type="map" class="async-panel__skeleton" />
+                            <div id="crime-map" class="border border-[#D8DECB]"></div>
+                        </div>
                         <input type="hidden" name="location_latitude" id="location_latitude" value="{{ old('location_latitude', '0.347596') }}">
                         <input type="hidden" name="location_longitude" id="location_longitude" value="{{ old('location_longitude', '32.582520') }}">
                         <div class="grid grid-cols-2 gap-4 mb-4">
@@ -167,8 +171,29 @@
                     {{-- Step 5: Review --}}
                     <div class="step-pane" data-step="5">
                         <div class="p-5 bg-[#F6F8F1] border border-[#E1E7D6] rounded-xl mb-4">
-                            <h2 class="font-semibold text-[#1F3318] mb-3">Review your report</h2>
-                            <dl class="grid grid-cols-3 gap-y-3 text-sm" id="review-summary"></dl>
+                            <h2 class="font-semibold text-[#1F3318] mb-4">Review your report</h2>
+                            <div id="review-summary" class="space-y-4 text-sm">
+                                <div class="grid grid-cols-1 gap-1 sm:grid-cols-[8rem_1fr] sm:gap-x-4 sm:gap-y-1">
+                                    <span class="text-[#5F6B57] font-medium">Category</span>
+                                    <span id="review-category" class="text-[#1F3318] break-words">—</span>
+                                </div>
+                                <div class="grid grid-cols-1 gap-1 sm:grid-cols-[8rem_1fr] sm:gap-x-4 sm:gap-y-1">
+                                    <span class="text-[#5F6B57] font-medium">Description</span>
+                                    <span id="review-description" class="text-[#1F3318] break-words whitespace-pre-wrap">—</span>
+                                </div>
+                                <div class="grid grid-cols-1 gap-1 sm:grid-cols-[8rem_1fr] sm:gap-x-4 sm:gap-y-1">
+                                    <span class="text-[#5F6B57] font-medium">Coordinates</span>
+                                    <span id="review-coordinates" class="text-[#1F3318] break-words">—</span>
+                                </div>
+                                <div class="grid grid-cols-1 gap-1 sm:grid-cols-[8rem_1fr] sm:gap-x-4 sm:gap-y-1">
+                                    <span class="text-[#5F6B57] font-medium">Address</span>
+                                    <span id="review-address" class="text-[#1F3318] break-words">—</span>
+                                </div>
+                                <div class="grid grid-cols-1 gap-1 sm:grid-cols-[8rem_1fr] sm:gap-x-4 sm:gap-y-1">
+                                    <span class="text-[#5F6B57] font-medium">Evidence files</span>
+                                    <span id="review-evidence" class="text-[#1F3318] break-words">—</span>
+                                </div>
+                            </div>
                         </div>
                         <p class="text-sm text-[#6B7568] mb-0">
                             By submitting, you confirm this information is accurate to the best of your knowledge.
@@ -195,10 +220,21 @@
             </div>
         </div>
     </main>
+</div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script>
+    <script defer>
         (function () {
+            let leafletReady = null;
+            const ensureLeaflet = () => {
+                if (!leafletReady) {
+                    leafletReady = Promise.all([
+                        window.ecrmsLoadStylesheet('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'),
+                        window.ecrmsLoadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'),
+                    ]);
+                }
+                return leafletReady;
+            };
+
             const totalSteps = 5;
             let currentStep = 1;
             let map = null;
@@ -251,53 +287,78 @@
                 if (step === 5) buildReview();
             };
 
-            const initMap = () => {
+            const initMap = async () => {
+                const panel = document.getElementById('crime-map-panel');
                 if (map) {
                     setTimeout(() => map.invalidateSize(), 150);
+                    window.ecrmsMarkAsyncPanelReady?.(panel);
                     return;
                 }
-                const latInput = document.getElementById('location_latitude');
-                const lngInput = document.getElementById('location_longitude');
-                const lat = parseFloat(latInput.value) || 0.347596;
-                const lng = parseFloat(lngInput.value) || 32.582520;
+                try {
+                    if (window.ecrmsWhenReady) await window.ecrmsWhenReady();
+                    await ensureLeaflet();
+                    const latInput = document.getElementById('location_latitude');
+                    const lngInput = document.getElementById('location_longitude');
+                    const lat = parseFloat(latInput.value) || 0.347596;
+                    const lng = parseFloat(lngInput.value) || 32.582520;
 
-                map = L.map('crime-map').setView([lat, lng], 8);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                }).addTo(map);
+                    map = L.map('crime-map').setView([lat, lng], 8);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(map);
 
-                marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+                    marker = L.marker([lat, lng], { draggable: true }).addTo(map);
 
-                const setCoords = (la, ln) => {
-                    latInput.value = la.toFixed(8);
-                    lngInput.value = ln.toFixed(8);
-                    document.getElementById('lat_display').value = la.toFixed(6);
-                    document.getElementById('lng_display').value = ln.toFixed(6);
-                };
+                    const setCoords = (la, ln) => {
+                        latInput.value = la.toFixed(8);
+                        lngInput.value = ln.toFixed(8);
+                        document.getElementById('lat_display').value = la.toFixed(6);
+                        document.getElementById('lng_display').value = ln.toFixed(6);
+                    };
 
-                setCoords(lat, lng);
-                map.on('click', (e) => {
-                    marker.setLatLng(e.latlng);
-                    setCoords(e.latlng.lat, e.latlng.lng);
-                });
-                marker.on('dragend', () => {
-                    const p = marker.getLatLng();
-                    setCoords(p.lat, p.lng);
-                });
-                setTimeout(() => map.invalidateSize(), 200);
+                    setCoords(lat, lng);
+                    map.on('click', (e) => {
+                        marker.setLatLng(e.latlng);
+                        setCoords(e.latlng.lat, e.latlng.lng);
+                    });
+                    marker.on('dragend', () => {
+                        const p = marker.getLatLng();
+                        setCoords(p.lat, p.lng);
+                    });
+                    setTimeout(() => map.invalidateSize(), 200);
+                } finally {
+                    window.ecrmsMarkAsyncPanelReady?.(panel);
+                }
+            };
+
+            const setReviewField = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.textContent = value && String(value).trim() !== '' ? String(value).trim() : '—';
+                }
             };
 
             const buildReview = () => {
-                const cat = form.crime_category_id.selectedOptions[0]?.text?.trim() || '—';
-                const files = form.querySelector('#evidence').files;
-                document.getElementById('review-summary').innerHTML = `
-                    <dt class="text-[#5F6B57] font-medium">Category</dt><dd class="col-span-2 text-[#1F3318]">${cat}</dd>
-                    <dt class="text-[#5F6B57] font-medium">Description</dt><dd class="col-span-2 text-[#1F3318]">${description.value || '—'}</dd>
-                    <dt class="text-[#5F6B57] font-medium">Coordinates</dt><dd class="col-span-2 text-[#1F3318]">${form.location_latitude.value}, ${form.location_longitude.value}</dd>
-                    <dt class="text-[#5F6B57] font-medium">Address</dt><dd class="col-span-2 text-[#1F3318]">${form.location_address.value || '—'}</dd>
-                    <dt class="text-[#5F6B57] font-medium">Evidence files</dt><dd class="col-span-2 text-[#1F3318]">${files.length} file(s)</dd>
-                `;
+                const crimeSelect = document.getElementById('crime_id');
+                const selectedCategory = crimeSelect?.selectedOptions?.[0];
+                const categoryLabel = selectedCategory?.value
+                    ? selectedCategory.text.trim()
+                    : '';
+
+                setReviewField('review-category', categoryLabel);
+                setReviewField('review-description', description?.value);
+
+                const lat = document.getElementById('location_latitude')?.value;
+                const lng = document.getElementById('location_longitude')?.value;
+                const coords = lat && lng ? `${lat}, ${lng}` : '';
+                setReviewField('review-coordinates', coords);
+
+                setReviewField('review-address', document.getElementById('location_address')?.value);
+
+                const evidenceInput = document.getElementById('evidence');
+                const fileCount = evidenceInput?.files?.length ?? 0;
+                setReviewField('review-evidence', fileCount > 0 ? `${fileCount} file(s)` : 'None');
             };
 
             description?.addEventListener('input', () => {

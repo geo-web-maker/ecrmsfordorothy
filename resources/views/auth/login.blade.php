@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="is-loading">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sign In — {{ config('app.name') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Citizen Sign In — {{ config('app.name') }}</title>
+    @include('partials.optimized-head')
     <style>
         body, input, button {
             font-family: 'Inter', sans-serif;
@@ -82,8 +79,12 @@
     </style>
 </head>
 <body style="background: #F3F5EA;">
+@include('partials.page-skeleton')
+@include('partials.auth-nav')
 
-<div class="flex min-h-screen">
+<div class="flex min-h-screen page-content flex-col">
+
+<div class="flex flex-1 min-h-0">
 
     {{-- ===================== LEFT PANEL ===================== --}}
     <div class="hidden md:flex flex-col justify-between relative overflow-hidden"
@@ -96,25 +97,20 @@
 
         <!-- Top: Branding -->
         <div>
-            <div class="flex items-center gap-2 mb-6">
-                <div style="width:10px; height:10px; border-radius:50%; background:#DDE8C8;"></div>
-                <span style="font-size:11px; font-weight:700; color:#DDE8C8; letter-spacing:2.5px; text-transform:uppercase;">
-                    {{ config('app.name') }}
-                </span>
-            </div>
+            @include('partials.brand-full-name', ['variant' => 'light', 'class' => 'mb-6'])
 
             <!-- Secure badge -->
             <div class="inline-flex items-center gap-2 mb-5"
                  style="background:rgba(221,232,200,0.15); border-radius:20px; padding:5px 12px;">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#DDE8C8" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <span style="font-size:10px; font-weight:700; color:#DDE8C8; letter-spacing:0.5px;">Secure Admin Portal</span>
+                <span style="font-size:10px; font-weight:700; color:#DDE8C8; letter-spacing:0.5px;">Citizen Portal</span>
             </div>
 
             <h1 style="font-size:28px; font-weight:800; color:white; line-height:1.35; margin:0 0 14px;">
-                Protecting Uganda's environment, one report at a time.
+                Report environmental crimes and track your cases.
             </h1>
             <p style="font-size:12px; color:rgba(221,232,200,0.75); line-height:1.7; margin:0;">
-                Sign in to manage, investigate, and respond to environmental crime reports submitted across the country.
+                Sign in to submit reports, upload evidence, and follow investigation progress securely.
             </p>
         </div>
 
@@ -125,8 +121,8 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DDE8C8" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
                 <div>
-                    <p style="font-size:12px; font-weight:700; color:white; margin:0;">Anonymous reports secured</p>
-                    <p style="font-size:11px; color:rgba(221,232,200,0.65); margin:0;">No reporter data ever exposed</p>
+                    <p style="font-size:12px; font-weight:700; color:white; margin:0;">Submit crime reports</p>
+                    <p style="font-size:11px; color:rgba(221,232,200,0.65); margin:0;">File cases with photos and details</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -134,8 +130,8 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DDE8C8" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
                 <div>
-                    <p style="font-size:12px; font-weight:700; color:white; margin:0;">Real-time status updates</p>
-                    <p style="font-size:11px; color:rgba(221,232,200,0.65); margin:0;">Live case progress tracking</p>
+                    <p style="font-size:12px; font-weight:700; color:white; margin:0;">Track case progress</p>
+                    <p style="font-size:11px; color:rgba(221,232,200,0.65); margin:0;">Follow status updates on your reports</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -143,8 +139,8 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DDE8C8" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                 </div>
                 <div>
-                    <p style="font-size:12px; font-weight:700; color:white; margin:0;">Investigation dashboard</p>
-                    <p style="font-size:11px; color:rgba(221,232,200,0.65); margin:0;">Full case history and notes</p>
+                    <p style="font-size:12px; font-weight:700; color:white; margin:0;">Secure whistleblower account</p>
+                    <p style="font-size:11px; color:rgba(221,232,200,0.65); margin:0;">Your identity is protected</p>
                 </div>
             </div>
         </div>
@@ -153,7 +149,7 @@
         <div>
             <hr style="border:none; border-top:1px solid rgba(221,232,200,0.15); margin-bottom:16px;">
             <p style="font-size:10px; color:rgba(221,232,200,0.4); margin:0;">
-                © {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
+                © {{ date('Y') }} NEMA — Environmental Crime Reporting & Monitoring System.
             </p>
         </div>
     </div>
@@ -172,23 +168,16 @@
                 </a>
             </div>
 
-            <!-- Mobile-only logo -->
-            <div class="flex items-center gap-2 mb-8 md:hidden">
-                <div style="width:8px; height:8px; border-radius:50%; background:#3F6B2A;"></div>
-                <span style="font-size:11px; font-weight:700; color:#3F6B2A; letter-spacing:2px; text-transform:uppercase;">
-                    {{ config('app.name') }}
-                </span>
-            </div>
 
             <!-- Heading -->
             <div class="mb-8">
                 <div class="inline-flex items-center gap-1.5 mb-3"
                      style="font-size:10px; font-weight:700; color:#5E8B3D; letter-spacing:1.5px; text-transform:uppercase;">
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#5E8B3D" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    Admin access only
+                    Citizen account
                 </div>
                 <h2 style="font-size:30px; font-weight:800; color:#3F6B2A; margin:0 0 6px;">Welcome back</h2>
-                <p style="font-size:13px; color:#7B8F69; margin:0;">Sign in to your NEMA eCRMS dashboard</p>
+                <p style="font-size:13px; color:#7B8F69; margin:0;">Sign in to your citizen dashboard</p>
             </div>
 
             @include('partials.flash')
@@ -286,7 +275,7 @@
                 >
                     <svg id="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                     <div class="spinner" id="btn-spinner"></div>
-                    <span id="btn-text">Sign in to dashboard</span>
+                    <span id="btn-text">Sign in to my reports</span>
                 </button>
             </form>
 
@@ -309,7 +298,7 @@
             </p>
 
             <!-- Public link -->
-            <p class="text-center" style="font-size:12px; color:#7B8F69; margin: 0;">
+            <p class="text-center" style="font-size:12px; color:#7B8F69; margin: 0 0 10px 0;">
                 Need confidentiality?
                 <a href="{{ route('report.anonymous') }}"
                    style="font-weight:700; color:#5E8B3D; text-decoration:none;"
@@ -322,6 +311,7 @@
         </div>
     </div>
 
+</div>
 </div>
 
 <script>

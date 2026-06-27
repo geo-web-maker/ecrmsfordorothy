@@ -83,12 +83,18 @@
                                     <div class="rounded-xl border overflow-hidden" style="border-color:rgba(94,139,61,0.12);">
                                         @if ($item->file_type === 'image')
                                             <a href="{{ asset('storage/'.$item->file_path) }}" target="_blank">
-                                                <img src="{{ asset('storage/'.$item->file_path) }}" alt="Evidence"
-                                                     class="h-28 sm:h-36 w-full object-cover hover:scale-105 transition duration-300">
+                                                <x-lazy-image
+                                                    :src="asset('storage/'.$item->file_path)"
+                                                    alt="Evidence"
+                                                    class="h-28 sm:h-36 w-full object-cover hover:scale-105 transition duration-300"
+                                                    height="9rem"
+                                                />
                                             </a>
                                         @else
-                                            <video src="{{ asset('storage/'.$item->file_path) }}" controls
-                                                   class="h-28 sm:h-36 w-full object-cover"></video>
+                                            <div class="lazy-media" data-lazy-media style="min-height: 9rem;">
+                                                <div class="lazy-media__skeleton skeleton skeleton-shimmer" aria-hidden="true"></div>
+                                                <video src="{{ asset('storage/'.$item->file_path) }}" controls preload="none" class="lazy-media__video h-28 sm:h-36 w-full object-cover"></video>
+                                            </div>
                                         @endif
                                     </div>
                                 @endforeach
@@ -133,7 +139,7 @@
                     </div>
 
                     {{-- Assign Officer (Admin only) --}}
-                    @if (Auth::user()->role === 'admin')
+                    @if (Auth::user()->isAdmin())
                     <div class="rounded-2xl border bg-white p-5 shadow-sm" style="border-color:rgba(94,139,61,0.15);">
                         <h3 class="text-sm font-bold mb-3" style="color:#1F3318;">Assign Officer</h3>
                         <form method="POST" action="{{ route('officer.report.assign', $report) }}" class="space-y-3">
@@ -193,18 +199,18 @@
                                             {{ $entry->old_status }} &rarr; {{ $entry->new_status }}
                                         </p>
                                         <time class="text-[11px] font-semibold" style="color:#7B8F69;">
-                                            {{ $entry->created_at->diffForHumans() }}
+                                            {{ $entry->changed_at?->diffForHumans() ?? '—' }}
                                         </time>
                                         @if ($entry->remarks)
                                             <div class="mt-2 rounded-xl border p-3 text-xs leading-relaxed"
                                                  style="background:#FAFBF7; border-color:rgba(94,139,61,0.1);">
                                                 <div class="flex flex-wrap items-center gap-1.5 mb-1.5">
-                                                    @if ($entry->changedByUser)
+                                                    @if ($entry->changedBy)
                                                         <span class="inline-block px-2 py-0.5 rounded-full text-white text-[10px] font-bold"
-                                                              style="background:{{ $entry->changedByUser->role === 'admin' ? '#4f46e5' : '#3F6B2A' }}">
-                                                            {{ $entry->changedByUser->role === 'admin' ? 'Admin' : 'Officer' }}
+                                                              style="background:{{ $entry->changedBy->isAdmin() ? '#4f46e5' : '#3F6B2A' }}">
+                                                            {{ $entry->changedBy->isAdmin() ? 'Admin' : 'Officer' }}
                                                         </span>
-                                                        <span class="text-[11px] font-semibold" style="color:#5F6B57;">{{ $entry->changedByUser->name }}</span>
+                                                        <span class="text-[11px] font-semibold" style="color:#5F6B57;">{{ $entry->changedBy->email }}</span>
                                                     @else
                                                         <span class="inline-block px-2 py-0.5 rounded-full bg-gray-400 text-white text-[10px] font-bold">System</span>
                                                     @endif

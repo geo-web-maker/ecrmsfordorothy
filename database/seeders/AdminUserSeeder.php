@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\Admin;
+use App\Models\Officer;
+use App\Models\Stuff;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -13,40 +15,47 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(
+        // Seed Admin account
+        $adminStuff = Stuff::updateOrCreate(
             ['email' => 'admin@nema.go.ug'],
             [
-                'name' => 'NEMA Admin',
                 'password' => Hash::make('Admin@12345'),
-                'role' => 'admin',
-                'phone_number' => '+256700000000',
+                'role'     => 'Admin',
                 'is_active' => true,
             ]
         );
+        Admin::updateOrCreate(
+            ['stuff_id' => $adminStuff->stuff_id],
+            ['full_name' => 'NEMA Admin']
+        );
 
-        // Seed default officers
-        User::updateOrCreate(
+        // Seed Officer accounts
+        $officer1Stuff = Stuff::updateOrCreate(
             ['email' => 'officer1@nema.go.ug'],
             [
-                'name' => 'John Doe',
-                'password' => Hash::make('Officer@12345'),
-                'role' => 'officer',
-                'phone_number' => '+256711111111',
+                'password'  => Hash::make('Officer@12345'),
+                'role'      => 'Officer',
                 'is_active' => true,
             ]
         );
+        Officer::updateOrCreate(
+            ['stuff_id' => $officer1Stuff->stuff_id],
+            ['full_name' => 'John Doe']
+        );
 
-        User::updateOrCreate(
+        $officer2Stuff = Stuff::updateOrCreate(
             ['email' => 'officer2@nema.go.ug'],
             [
-                'name' => 'Sarah Nabakooza',
-                'password' => Hash::make('Officer@12345'),
-                'role' => 'officer',
-                'phone_number' => '+256722222222',
+                'password'  => Hash::make('Officer@12345'),
+                'role'      => 'Officer',
                 'is_active' => true,
             ]
         );
+        Officer::updateOrCreate(
+            ['stuff_id' => $officer2Stuff->stuff_id],
+            ['full_name' => 'Sarah Nabakooza']
+        );
 
-        $this->command?->info('Admin and Officer users seeded successfully.');
+        $this->command?->info('Admin and Officer users seeded successfully (stuff + profile tables).');
     }
 }

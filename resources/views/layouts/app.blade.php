@@ -1,20 +1,14 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="is-loading">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="theme-color" content="#3F6B2A">
 
         <title>{{ config('app.name', 'NEMA eCRMS') }}</title>
 
-        <!-- Inter Font -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @stack('styles')
+        @include('partials.optimized-head')
 
         <style>
             /* ── Base reset ────────────────────────────── */
@@ -85,6 +79,7 @@
             a { text-decoration: none; }
 
             img, video { max-width: 100%; height: auto; display: block; }
+            img[loading="lazy"] { content-visibility: auto; }
 
             /* ── System card ───────────────────────────── */
             .sys-card {
@@ -211,8 +206,11 @@
         </style>
     </head>
     <body>
-        <div class="min-h-screen">
-            @include('layouts.navigation')
+        @include('partials.page-skeleton')
+
+        @include('layouts.navigation')
+
+        <div class="min-h-screen page-content">
 
             <!-- Page Heading -->
             @isset($header)

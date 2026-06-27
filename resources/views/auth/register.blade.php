@@ -1,13 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="is-loading">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Register — {{ config('app.name') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    @include('partials.optimized-head')
     <style>
         body, input, button {
             font-family: 'Inter', sans-serif;
@@ -72,8 +69,12 @@
     </style>
 </head>
 <body style="background: #F3F5EA;">
+@include('partials.page-skeleton')
+@include('partials.auth-nav')
 
-<div class="flex min-h-screen">
+<div class="flex min-h-screen page-content flex-col">
+
+<div class="flex flex-1 min-h-0">
 
     {{-- ===================== LEFT PANEL ===================== --}}
     <div class="hidden md:flex flex-col justify-between relative overflow-hidden"
@@ -85,24 +86,19 @@
 
         <!-- Branding -->
         <div>
-            <div class="flex items-center gap-2 mb-6">
-                <div style="width:10px; height:10px; border-radius:50%; background:#DDE8C8;"></div>
-                <span style="font-size:11px; font-weight:700; color:#DDE8C8; letter-spacing:2.5px; text-transform:uppercase;">
-                    {{ config('app.name') }}
-                </span>
-            </div>
+            @include('partials.brand-full-name', ['variant' => 'light', 'class' => 'mb-6'])
 
             <div class="inline-flex items-center gap-2 mb-5"
                  style="background:rgba(221,232,200,0.15); border-radius:20px; padding:5px 12px;">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#DDE8C8" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span style="font-size:10px; font-weight:700; color:#DDE8C8; letter-spacing:0.5px;">Invite-only registration</span>
+                <span style="font-size:10px; font-weight:700; color:#DDE8C8; letter-spacing:0.5px;">Citizen registration</span>
             </div>
 
             <h1 style="font-size:28px; font-weight:800; color:white; line-height:1.35; margin:0 0 14px;">
-                Join the team fighting environmental crime in Uganda.
+                Report environmental crimes and protect Uganda's environment.
             </h1>
             <p style="font-size:12px; color:rgba(221,232,200,0.75); line-height:1.7; margin:0;">
-                Create your admin account to start reviewing reports, updating case statuses, and coordinating investigations across the country.
+                Create your citizen account to submit reports, upload evidence, and track case progress securely.
             </p>
         </div>
 
@@ -117,7 +113,7 @@
                 </div>
                 <div style="padding-top:3px;">
                     <p style="font-size:12px; font-weight:700; color:white; margin:0;">Create your account</p>
-                    <p style="font-size:11px; color:rgba(221,232,200,0.6); margin:0;">Fill in your name, email and password</p>
+                    <p style="font-size:11px; color:rgba(221,232,200,0.6); margin:0;">Fill in your name, email, phone and password</p>
                 </div>
             </div>
             <div class="flex items-start gap-3">
@@ -134,8 +130,8 @@
                     <span style="font-size:11px; font-weight:800; color:#DDE8C8;">3</span>
                 </div>
                 <div style="padding-top:3px;">
-                    <p style="font-size:12px; font-weight:700; color:rgba(255,255,255,0.7); margin:0;">Access your dashboard</p>
-                    <p style="font-size:11px; color:rgba(221,232,200,0.5); margin:0;">Start managing and investigating reports</p>
+                    <p style="font-size:12px; font-weight:700; color:white; margin:0;">Access your dashboard</p>
+                    <p style="font-size:11px; color:rgba(221,232,200,0.5); margin:0;">Submit and track environmental crime reports</p>
                 </div>
             </div>
         </div>
@@ -144,7 +140,7 @@
         <div>
             <hr style="border:none; border-top:1px solid rgba(221,232,200,0.15); margin-bottom:16px;">
             <p style="font-size:10px; color:rgba(221,232,200,0.4); margin:0;">
-                © {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
+                © {{ date('Y') }} NEMA — Environmental Crime Reporting & Monitoring System.
             </p>
         </div>
     </div>
@@ -163,18 +159,10 @@
                 </a>
             </div>
 
-            <!-- Mobile logo -->
-            <div class="flex items-center gap-2 mb-8 md:hidden">
-                <div style="width:8px; height:8px; border-radius:50%; background:#3F6B2A;"></div>
-                <span style="font-size:11px; font-weight:700; color:#3F6B2A; letter-spacing:2px; text-transform:uppercase;">
-                    {{ config('app.name') }}
-                </span>
-            </div>
-
             <!-- Heading -->
             <div class="mb-7">
                 <h2 style="font-size:28px; font-weight:800; color:#3F6B2A; margin:0 0 5px;">Create your account</h2>
-                <p style="font-size:13px; color:#7B8F69; margin:0;">Join the NEMA eCRMS investigation team</p>
+                <p style="font-size:13px; color:#7B8F69; margin:0;">Create your NEMA citizen account for the Environmental Crime Reporting & Monitoring System</p>
             </div>
 
             @include('partials.flash')
@@ -230,6 +218,38 @@
                         style="padding:11px 16px; border-radius:12px; border:2px solid #5E8B3D; background:#DDE8C8; font-size:14px; color:#3F6B2A; font-weight:600; transition:all 0.2s; box-shadow:inset 0 2px 4px rgba(63,107,42,0.06);"
                     >
                     @error('email')
+                        <div class="flex items-center gap-1.5 mt-1.5" style="font-size:11px; font-weight:600; color:#c0392b;">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+
+                <!-- Phone -->
+                <div class="mb-4">
+                    <p class="flex items-start gap-2 mb-3"
+                       style="font-size:11px; line-height:1.5; color:#5F6B57; margin:0 0 12px; padding:10px 12px; border-radius:10px; background:rgba(94,139,61,0.08); border:1px solid rgba(94,139,61,0.18);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5E8B3D" stroke-width="2.5" style="flex-shrink:0; margin-top:1px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        <span>Your phone number will be used to send <strong style="color:#3F6B2A;">SMS tracking codes</strong> and case status updates.</span>
+                    </p>
+                    <label for="phone_number"
+                           class="flex items-center gap-1.5 mb-2"
+                           style="font-size:10px; font-weight:700; color:#3F6B2A; letter-spacing:1.2px; text-transform:uppercase;">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        Phone number
+                    </label>
+                    <input
+                        id="phone_number"
+                        type="tel"
+                        name="phone_number"
+                        value="{{ old('phone_number') }}"
+                        required
+                        autocomplete="tel"
+                        placeholder="e.g. 07XX XXX XXX or +2567XX XXX XXX"
+                        class="green-input w-full"
+                        style="padding:11px 16px; border-radius:12px; border:2px solid #5E8B3D; background:#DDE8C8; font-size:14px; color:#3F6B2A; font-weight:600; transition:all 0.2s; box-shadow:inset 0 2px 4px rgba(63,107,42,0.06);"
+                    >
+                    @error('phone_number')
                         <div class="flex items-center gap-1.5 mt-1.5" style="font-size:11px; font-weight:600; color:#c0392b;">
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                             {{ $message }}
@@ -345,6 +365,7 @@
         </div>
     </div>
 
+</div>
 </div>
 
 <script>

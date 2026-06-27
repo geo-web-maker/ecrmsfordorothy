@@ -1,0 +1,37 @@
+@keyframes splash-pulse-ring {
+    0% { transform: scale(0.95); opacity: 0.2; }
+    50% { transform: scale(1.1); opacity: 0.5; }
+    100% { transform: scale(0.95); opacity: 0.2; }
+}
+
+@keyframes splash-rotate-loader {
+    to { transform: rotate(360deg); }
+}
+
+.splash-pulse-ring {
+    animation: splash-pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.splash-loader {
+    animation: splash-rotate-loader 1.5s linear infinite;
+}
+
+.splash-screen {
+    min-height: 100dvh;
+    background-color: #012d1d;
+    cursor: pointer;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+
+.splash-icon {
+    display: block;
+    flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .splash-pulse-ring,
+    .splash-loader,
+    .splash-hint-pulse {
+        animation: none !important;
+    }
+}

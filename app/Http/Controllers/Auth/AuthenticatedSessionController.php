@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -28,10 +29,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return match (auth()->user()->role) {
-            'admin', 'officer' => redirect()->route('officer.dashboard'),
-            default => redirect()->route('citizen.dashboard'),
-        };
+        $user = auth()->user();
+
+        if ($user->isAdmin() || $user->isOfficer()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            throw ValidationException::withMessages([
+                'email' => 'This account cannot sign in here. Please use the correct sign-in page for your role.',
+            ]);
+        }
+
+        return redirect()->intended(route('citizen.dashboard'));
     }
 
     /**
@@ -39,12 +49,20 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $wasStaff = auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isOfficer());
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        $redirect = $request->string('redirect')->toString();
+
+        if ($redirect !== '' && str_starts_with($redirect, '/')) {
+            return redirect($redirect);
+        }
+
+        return redirect($wasStaff ? route('admin.login') : route('home'));
     }
 }

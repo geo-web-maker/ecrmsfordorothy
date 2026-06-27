@@ -192,10 +192,19 @@
                                 <div class="rounded-xl border overflow-hidden bg-[#FAFBF7]" style="border-color:rgba(94,139,61,0.12);">
                                     @if ($item->file_type === 'image')
                                         <a href="{{ asset('storage/'.$item->file_path) }}" target="_blank" title="View Full Image">
-                                            <img src="{{ asset('storage/'.$item->file_path) }}" alt="Evidence" class="h-28 w-full object-cover hover:scale-105 transition duration-300">
-                                        </a>
+                                            <a href="{{ asset('storage/'.$item->file_path) }}" target="_blank" title="View Full Image">
+                                                <x-lazy-image
+                                                    :src="asset('storage/'.$item->file_path)"
+                                                    alt="Evidence"
+                                                    class="h-28 w-full object-cover hover:scale-105 transition duration-300"
+                                                    height="7rem"
+                                                />
+                                            </a>
                                     @else
-                                        <video src="{{ asset('storage/'.$item->file_path) }}" controls class="h-28 w-full object-cover"></video>
+                                        <div class="lazy-media" data-lazy-media style="min-height: 7rem;">
+                                            <div class="lazy-media__skeleton skeleton skeleton-shimmer" aria-hidden="true"></div>
+                                            <video src="{{ asset('storage/'.$item->file_path) }}" controls preload="none" class="lazy-media__video h-28 w-full object-cover"></video>
+                                        </div>
                                     @endif
                                 </div>
                                 @endforeach
@@ -217,7 +226,7 @@
                                         {{ $entry->old_status }} &rarr; {{ $entry->new_status }}
                                     </div>
                                     <time class="block mb-1 text-[11px] font-bold" style="color:#7B8F69;">
-                                        {{ $entry->created_at->format('M d, Y \a\t H:i') }}
+                                        {{ $entry->changed_at?->format('M d, Y \a\t H:i') ?? '—' }}
                                     </time>
                                 </li>
                                 @endforeach

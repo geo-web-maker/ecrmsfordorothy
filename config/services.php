@@ -35,4 +35,25 @@ return [
         ],
     ],
 
+    'textbee' => [
+        'api_key'   => env('TEXTBEE_API_KEY'),
+        'device_id' => env('TEXTBEE_DEVICE_ID'),
+        'base_url'  => env('TEXTBEE_BASE_URL', 'https://api.textbee.dev/api/v1'),
+        'timeout'   => env('TEXTBEE_TIMEOUT', 30),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Outbound HTTP (SSL)
+    |--------------------------------------------------------------------------
+    |
+    | XAMPP/Windows PHP often ships without curl.cainfo set. Point CACERT_PATH
+    | at the bundled bootstrap/certs/cacert.pem file to fix cURL error 60.
+    |
+    */
+    'http' => [
+        'verify_ssl' => env('HTTP_SSL_VERIFY', true),
+        'ca_bundle'  => env('CACERT_PATH', base_path('bootstrap/certs/cacert.pem')),
+    ],
+
 ];

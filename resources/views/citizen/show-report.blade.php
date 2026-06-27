@@ -68,11 +68,17 @@
                         @foreach ($report->evidence as $item)
                             <div class="rounded-xl border overflow-hidden" style="border-color:rgba(94,139,61,0.12);">
                                 @if ($item->file_type === 'image')
-                                    <img src="{{ asset('storage/'.$item->file_path) }}" alt="Evidence"
-                                         class="h-28 sm:h-36 w-full object-cover">
+                                    <x-lazy-image
+                                        :src="asset('storage/'.$item->file_path)"
+                                        alt="Evidence"
+                                        class="h-28 sm:h-36 w-full object-cover"
+                                        height="9rem"
+                                    />
                                 @else
-                                    <video src="{{ asset('storage/'.$item->file_path) }}" controls
-                                           class="h-28 sm:h-36 w-full object-cover"></video>
+                                    <div class="lazy-media" data-lazy-media style="min-height: 9rem;">
+                                        <div class="lazy-media__skeleton skeleton skeleton-shimmer" aria-hidden="true"></div>
+                                        <video src="{{ asset('storage/'.$item->file_path) }}" controls preload="none" class="lazy-media__video h-28 sm:h-36 w-full object-cover"></video>
+                                    </div>
                                 @endif
                             </div>
                         @endforeach
@@ -95,7 +101,7 @@
                                     {{ $entry->old_status }} &rarr; {{ $entry->new_status }}
                                 </p>
                                 <time class="text-xs font-semibold" style="color:#7B8F69;">
-                                    {{ $entry->created_at->format('M d, Y H:i') }}
+                                    {{ $entry->changed_at?->format('M d, Y H:i') ?? '—' }}
                                 </time>
                             </li>
                         @endforeach

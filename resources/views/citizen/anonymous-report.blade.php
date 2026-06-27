@@ -1,15 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="is-loading">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Anonymous Report — {{ config('app.name', 'ECRMS') }}</title>
     <meta name="description" content="Securely and anonymously report environmental crimes to NEMA. Your identity is fully protected.">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    @include('partials.optimized-head')
     <style>
         body {
             background: linear-gradient(150deg,
@@ -30,41 +26,24 @@
             top: -140px; left: -140px;
             background: radial-gradient(circle, rgba(94,139,61,0.18) 0%, transparent 70%);
         }
-    <style>
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        #map { width: 100%; }
+        #map { width: 100%; height: 240px; z-index: 0; }
+        .map-panel { min-height: 240px; }
+        .leaflet-container { font-family: inherit; }
     </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 </head>
 <body class="font-sans text-gray-900 antialiased">
+@include('partials.page-skeleton')
+@include('partials.public-nav')
 
-<!-- Shared nav bar -->
-<header class="fixed top-0 left-0 w-full z-[1000] transition-all duration-300" style="background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(94, 139, 61, 0.15);">
-    <div class="max-w-screen-xl mx-auto flex items-center justify-between px-8 py-[0.6rem]">
-        <a href="{{ route('home') }}" class="flex items-center gap-2 no-underline font-extrabold text-lg text-gray-900 tracking-tight">🌿 NEMA <span class="text-[#5E8B3D]">eCRMS</span></a>
-        <nav class="flex items-center gap-8">
-            <a href="{{ route('report.anonymous') }}" class="no-underline text-[#5E8B3D] font-bold text-sm transition-colors hover:text-[#3F6B2A]">Report Crime</a>
-            <a href="{{ route('report.track') }}" class="no-underline text-gray-600 font-semibold text-sm transition-colors hover:text-[#5E8B3D]">Track Case</a>
-        </nav>
-        <div class="flex items-center gap-3">
-            @auth
-                <a href="{{ auth()->user()->isCitizen() ? route('citizen.dashboard') : route('officer.dashboard') }}" class="inline-flex items-center justify-center px-[1.4rem] py-[0.6rem] rounded-full font-semibold text-sm no-underline border-2 border-[#5E8B3D] text-[#5E8B3D] bg-transparent transition-all duration-300 hover:bg-[#5E8B3D] hover:text-white hover:-translate-y-0.5">Dashboard</a>
-                <form method="POST" action="{{ route('logout') }}" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="font-semibold text-sm cursor-pointer rounded-full px-[1.4rem] py-[0.6rem] transition-all duration-300 border-1.5" style="background: rgba(220, 53, 69, 0.08); color: #c0392b; border: 1.5px solid rgba(220, 53, 69, 0.3);" onmouseover="this.style.background='#dc3545'; this.style.color='#fff'; this.style.borderColor='#dc3545';" onmouseout="this.style.background='rgba(220, 53, 69, 0.08)'; this.style.color='#c0392b'; this.style.borderColor='rgba(220, 53, 69, 0.3)';">Logout</button>
-                </form>
-            @else
-                <a href="{{ route('login') }}" class="no-underline text-gray-600 font-semibold text-sm transition-colors hover:text-[#5E8B3D]">Log in</a>
-                <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-[1.4rem] py-[0.6rem] rounded-full font-semibold text-sm no-underline bg-[#5E8B3D] text-white border-2 border-[#5E8B3D] transition-all duration-300 hover:bg-[#3F6B2A] hover:-translate-y-0.5" style="box-shadow: 0 2px 8px rgba(94, 139, 61, 0.3);">Register</a>
-            @endauth
-        </div>
-    </div>
-</header>
+<div class="page-content">
 
 <!-- Main page -->
-<div class="report-page min-h-screen px-6 pt-32 pb-16 relative overflow-x-hidden font-sans">
+<div class="report-page min-h-screen px-6 pt-8 pb-16 relative overflow-x-hidden font-sans">
     <!-- Decorative leaves -->
     <span class="fixed pointer-events-none opacity-5 z-0" style="font-size: 160px; line-height: 1; top: 5%; left: 2%; transform: rotate(-25deg);">🌿</span>
     <span class="fixed pointer-events-none opacity-5 z-0" style="font-size: 160px; line-height: 1; bottom: 5%; right: 2%; transform: rotate(155deg);">🌿</span>
@@ -78,20 +57,20 @@
         </a>
 
         <!-- Heading -->
-        <div class="text-center mb-10" style="animation: fadeInUp 0.8s ease-out;">
+        <div class="text-center mb-10 px-4 sm:px-0" style="animation: fadeInUp 0.8s ease-out;">
             <div class="inline-flex items-center gap-2 text-[#3F6B2A] font-bold text-[0.78rem] uppercase tracking-[1px] mb-5 px-[1.1rem] py-[0.4rem] rounded-full" style="background: rgba(94,139,61,0.12); border: 1.5px solid rgba(94,139,61,0.25);">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 100% Anonymous &amp; Encrypted
             </div>
-            <h1 class="text-[2.4rem] font-extrabold text-gray-900 tracking-[-0.75px] leading-[1.2] mb-3">Anonymous Environmental<br>Crime Report</h1>
-            <p class="text-base text-gray-600 max-w-[540px] mx-auto leading-[1.65]">Your identity is protected. Submit environmental violations safely and anonymously — you'll receive a secure tracking code after submission.</p>
+            <h1 class="text-3xl sm:text-[2.4rem] font-extrabold text-gray-900 tracking-[-0.75px] leading-[1.2] mb-3">Anonymous Environmental<br>Crime Report</h1>
+            <p class="text-sm sm:text-base text-gray-600 max-w-[540px] mx-auto leading-[1.65]">Your identity is protected. Submit environmental violations safely and anonymously — you'll receive a secure tracking code after submission.</p>
         </div>
 
         <!-- Flash messages -->
         @include('partials.flash')
 
         <!-- Form card -->
-        <div class="rounded-[30px] p-11" style="animation: fadeInUp 0.8s ease-out 0.1s both; background: rgba(243, 245, 234, 0.82); backdrop-filter: blur(20px); border: 1.5px solid rgba(94, 139, 61, 0.18); box-shadow: 0 8px 40px rgba(63, 107, 42, 0.12), 0 1px 0 rgba(255,255,255,0.8) inset;">
+        <div class="rounded-[30px] p-6 sm:p-11" style="animation: fadeInUp 0.8s ease-out 0.1s both; background: rgba(243, 245, 234, 0.82); backdrop-filter: blur(20px); border: 1.5px solid rgba(94, 139, 61, 0.18); box-shadow: 0 8px 40px rgba(63, 107, 42, 0.12), 0 1px 0 rgba(255,255,255,0.8) inset;">
             <form method="POST" action="{{ route('report.anonymous.store') }}" enctype="multipart/form-data" id="reportForm" novalidate>
                 @csrf
 
@@ -117,25 +96,25 @@
                 </div>
 
                 <!-- Two-column: Category + Date -->
-                <div class="grid gap-5 mb-[1.6rem]" style="grid-template-columns: 1fr 1fr;">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-[1.6rem]">
                     <!-- Crime Category -->
                     <div>
-                        <label class="flex items-center gap-[0.45rem] text-sm font-semibold text-[#9aad8a] mb-2" for="crime_category_id">
+                        <label class="flex items-center gap-[0.45rem] text-sm font-semibold text-[#9aad8a] mb-2" for="crime_id">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
                             Crime Category
                         </label>
                         <div class="relative">
-                            <select name="crime_category_id" id="crime_category_id" class="w-full text-gray-900 font-sans text-[0.93rem] outline-none px-5 py-[0.85rem] border-2 rounded-full border-[rgba(94,139,61,0.22)] bg-[rgba(255,255,255,0.80)] appearance-none pr-10 transition-all hover:border-[rgba(94,139,61,0.45)] focus:bg-white focus:border-[#5E8B3D] focus:ring-2 focus:ring-[rgba(94,139,61,0.12)] @error('crime_category_id') border-[rgba(192,57,43,0.55)] @enderror cursor-pointer" required>
+                            <select name="crime_id" id="crime_id" class="w-full text-gray-900 font-sans text-[0.93rem] outline-none px-5 py-[0.85rem] border-2 rounded-full border-[rgba(94,139,61,0.22)] bg-[rgba(255,255,255,0.80)] appearance-none pr-10 transition-all hover:border-[rgba(94,139,61,0.45)] focus:bg-white focus:border-[#5E8B3D] focus:ring-2 focus:ring-[rgba(94,139,61,0.12)] @error('crime_id') border-[rgba(192,57,43,0.55)] @enderror cursor-pointer" required>
                                 <option value="">Select category…</option>
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" @selected(old('crime_category_id') == $category->id)>
-                                        {{ $category->name }}
+                                    <option value="{{ $category->crime_id }}" @selected(old('crime_id') == $category->crime_id)>
+                                        {{ $category->category_name }}
                                     </option>
                                 @endforeach
                             </select>
                             <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none w-0 h-0" style="border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #5E8B3D;"></div>
                         </div>
-                        @error('crime_category_id')
+                        @error('crime_id')
                             <div class="flex items-center gap-[0.35rem] text-[0.78rem] mt-[0.4rem] pl-2 text-red-600">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                                 {{ $message }}
@@ -193,8 +172,8 @@
 
                 <!-- Interactive Map -->
                 <div class="mb-[1.6rem]">
-                    <div class="overflow-hidden relative rounded-[20px] border-2 border-[rgba(94,139,61,0.22)]" style="box-shadow: 0 4px 18px rgba(63,107,42,0.10);">
-                        <div id="map" class="w-full" style="height: 240px; z-index: 0;"></div>
+                    <div class="map-panel overflow-hidden relative rounded-[20px] border-2 border-[rgba(94,139,61,0.22)]" id="anon-map-panel" style="box-shadow: 0 4px 18px rgba(63,107,42,0.10);">
+                        <div id="map" class="w-full"></div>
                         <button type="button" class="absolute bottom-3 right-3 text-white border-none rounded-full text-[0.8rem] font-semibold cursor-pointer flex items-center gap-[0.4rem] font-sans z-[400] px-[1.1rem] py-2 transition-all hover:-translate-y-0.5" id="useMyLocation" style="background: rgba(94,139,61,0.92); backdrop-filter: blur(6px);" onmouseover="this.style.background='#3F6B2A';" onmouseout="this.style.background='rgba(94,139,61,0.92)';">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="12" r="1"/></svg>
                             Use My Location
@@ -234,6 +213,32 @@
 
                 <hr class="border-none my-8" style="border-top: 1.5px solid rgba(94,139,61,0.12);">
 
+                <!-- Section: SMS tracking -->
+                <div class="text-[0.7rem] font-bold uppercase tracking-[1px] text-[#7B8F69] mb-5 flex items-center gap-2">
+                    Receive Your Tracking Code
+                    <div class="flex-1 h-px" style="background: rgba(94,139,61,0.15);"></div>
+                </div>
+
+                <p class="flex items-start gap-2 mb-4 text-[0.82rem] leading-relaxed text-[#5F6B57] px-4 py-3 rounded-2xl"
+                   style="background: rgba(94,139,61,0.08); border: 1px solid rgba(94,139,61,0.18);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5E8B3D" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    <span>Your identity stays anonymous. We only use your phone number to send your <strong style="color:#3F6B2A;">tracking code</strong> and case status updates by SMS.</span>
+                </p>
+
+                <div class="mb-[1.6rem]">
+                    <label class="flex items-center gap-[0.45rem] text-sm font-semibold text-[#9aad8a] mb-2" for="reporter_phone">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        Phone Number
+                    </label>
+                    <input type="tel" name="reporter_phone" id="reporter_phone" value="{{ old('reporter_phone') }}" required autocomplete="tel" placeholder="e.g. 07XX XXX XXX or +2567XX XXX XXX" class="w-full text-gray-900 font-sans text-[0.93rem] outline-none px-5 py-[0.85rem] border-2 rounded-full border-[rgba(94,139,61,0.22)] bg-[rgba(255,255,255,0.80)] transition-all hover:border-[rgba(94,139,61,0.45)] focus:bg-white focus:border-[#5E8B3D] focus:ring-2 focus:ring-[rgba(94,139,61,0.12)] @error('reporter_phone') border-[rgba(192,57,43,0.55)] @enderror">
+                    @error('reporter_phone')
+                        <div class="flex items-center gap-[0.35rem] text-[0.78rem] mt-[0.4rem] pl-2 text-red-600">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+
                 <!-- Submit -->
                 <button type="submit" class="w-full text-white font-sans text-base font-bold border-none rounded-full cursor-pointer flex items-center justify-center gap-[0.6rem] mt-2 px-8 py-4 transition-all hover:-translate-y-0.5" style="background: #5E8B3D; box-shadow: 0 6px 20px rgba(94,139,61,0.35);" onmouseover="this.style.background='#3F6B2A'; this.style.boxShadow='0 10px 28px rgba(63,107,42,0.40)';" onmouseout="this.style.background='#5E8B3D'; this.style.boxShadow='0 6px 20px rgba(94,139,61,0.35)';">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -261,59 +266,83 @@
         <!-- Footer note -->
         <div class="text-center mt-6 text-[0.82rem] text-gray-600 flex items-center justify-center gap-[0.4rem]" style="animation: fadeInUp 0.8s ease-out 0.35s both;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            After submission, you will receive an anonymous tracking code to monitor your case.
+            After submission, you will see your tracking code on screen and receive a copy by SMS.
         </div>
 
     </div>
 </div>
+</div>
 
-<!-- Leaflet Map JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-    // ── Leaflet Map ──
-    const initLat = parseFloat(document.getElementById('location_latitude').value);
-    const initLng = parseFloat(document.getElementById('location_longitude').value);
-    const map = L.map('map').setView([initLat, initLng], 8);
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+<script defer>
+    let anonMapInitialized = false;
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    function initAnonReportMap() {
+        if (anonMapInitialized || typeof L === 'undefined') return;
+        anonMapInitialized = true;
 
-    // Custom green marker icon
-    const greenIcon = L.divIcon({
-        html: `<div style="
-            width:28px;height:28px;background:#5E8B3D;
-            border:3px solid #fff;border-radius:50% 50% 50% 0;
-            transform:rotate(-45deg);
-            box-shadow:0 3px 10px rgba(0,0,0,0.25);">
-        </div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 28],
-        className: ''
-    });
+        const initLat = parseFloat(document.getElementById('location_latitude').value);
+        const initLng = parseFloat(document.getElementById('location_longitude').value);
+        const map = L.map('map').setView([initLat, initLng], 8);
 
-    const marker = L.marker([initLat, initLng], { draggable: true, icon: greenIcon }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
 
-    const setCoords = (lat, lng) => {
-        document.getElementById('location_latitude').value = lat.toFixed(8);
-        document.getElementById('location_longitude').value = lng.toFixed(8);
-    };
+        const greenIcon = L.divIcon({
+            html: `<div style="
+                width:28px;height:28px;background:#5E8B3D;
+                border:3px solid #fff;border-radius:50% 50% 50% 0;
+                transform:rotate(-45deg);
+                box-shadow:0 3px 10px rgba(0,0,0,0.25);">
+            </div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 28],
+            className: ''
+        });
 
-    map.on('click', (e) => { marker.setLatLng(e.latlng); setCoords(e.latlng.lat, e.latlng.lng); });
-    marker.on('dragend', () => { const p = marker.getLatLng(); setCoords(p.lat, p.lng); });
+        const marker = L.marker([initLat, initLng], { draggable: true, icon: greenIcon }).addTo(map);
 
-    // Use My Location button
-    document.getElementById('useMyLocation').addEventListener('click', () => {
-        if (!navigator.geolocation) return alert('Geolocation not supported by your browser.');
-        navigator.geolocation.getCurrentPosition((pos) => {
-            const { latitude, longitude } = pos.coords;
-            marker.setLatLng([latitude, longitude]);
-            map.setView([latitude, longitude], 13);
-            setCoords(latitude, longitude);
-        }, () => alert('Unable to retrieve your location. Please pin it manually on the map.'));
-    });
+        const setCoords = (lat, lng) => {
+            document.getElementById('location_latitude').value = lat.toFixed(8);
+            document.getElementById('location_longitude').value = lng.toFixed(8);
+        };
+
+        map.on('click', (e) => { marker.setLatLng(e.latlng); setCoords(e.latlng.lat, e.latlng.lng); });
+        marker.on('dragend', () => { const p = marker.getLatLng(); setCoords(p.lat, p.lng); });
+
+        document.getElementById('useMyLocation').addEventListener('click', () => {
+            if (!navigator.geolocation) return alert('Geolocation not supported by your browser.');
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const { latitude, longitude } = pos.coords;
+                marker.setLatLng([latitude, longitude]);
+                map.setView([latitude, longitude], 13);
+                setCoords(latitude, longitude);
+            }, () => alert('Unable to retrieve your location. Please pin it manually on the map.'));
+        });
+
+        setTimeout(() => map.invalidateSize(), 250);
+    }
+
+    function bootAnonReportMap() {
+        if (typeof L !== 'undefined') {
+            initAnonReportMap();
+            return;
+        }
+        const leafletScript = document.querySelector('script[src*="leaflet"]');
+        if (leafletScript) {
+            leafletScript.addEventListener('load', initAnonReportMap, { once: true });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootAnonReportMap, { once: true });
+    } else {
+        bootAnonReportMap();
+    }
 
     // ── File drag-and-drop & image previews ──
+    document.addEventListener('DOMContentLoaded', () => {
     const dropZone  = document.getElementById('dropZone');
     const fileInput = document.getElementById('evidenceInput');
     const previews  = document.getElementById('filePreviews');
@@ -345,6 +374,7 @@
         dropZone.classList.remove('drag-over');
         fileInput.files = e.dataTransfer.files;
         renderPreviews(e.dataTransfer.files);
+    });
     });
 </script>
 

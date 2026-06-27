@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="is-loading">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Track Report — {{ config('app.name') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.optimized-head')
     <style>
         html {
             scroll-behavior: smooth;
@@ -21,6 +21,69 @@
         #report-results.visible {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* Staggered entrance for result content */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #report-results .animate-item {
+            opacity: 0;
+        }
+
+        #report-results.visible .animate-item {
+            animation: fadeInUp 0.55s ease forwards;
+        }
+
+        #report-results.visible .animate-delay-1 { animation-delay: 0.15s; }
+        #report-results.visible .animate-delay-2 { animation-delay: 0.25s; }
+        #report-results.visible .animate-delay-3 { animation-delay: 0.35s; }
+        #report-results.visible .animate-delay-4 { animation-delay: 0.45s; }
+        #report-results.visible .animate-delay-5 { animation-delay: 0.55s; }
+        #report-results.visible .animate-delay-6 { animation-delay: 0.65s; }
+
+        /* Page section entrance on first load */
+        .track-enter {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        html.is-ready .track-enter {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        html.is-ready .track-enter--delay-1 { animation-delay: 0.1s; }
+        html.is-ready .track-enter--delay-2 { animation-delay: 0.2s; }
+
+        #scroll-hint {
+            opacity: 0;
+        }
+
+        #scroll-hint.visible {
+            animation: fadeInUp 0.5s ease 0.8s forwards;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #report-results,
+            #report-results.visible,
+            #report-results .animate-item,
+            #report-results.visible .animate-item,
+            .track-enter,
+            #scroll-hint,
+            #scroll-hint.visible {
+                animation: none !important;
+                transition: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
         }
 
         /* Animated scroll-down arrow bounce */
@@ -87,8 +150,8 @@
 </head>
 
 <body class="antialiased" style="background: #F3F5EA;">
-
-    <!-- Back Navigation -->
+@include('partials.page-skeleton')
+<div class="page-content">
     <div class="px-6 pt-6 md:px-12">
         <a href="{{ route('home') }}"
             class="inline-flex items-center gap-1 text-sm font-semibold transition-all hover:gap-2"
@@ -106,7 +169,7 @@
         <div class="mx-auto max-w-7xl">
 
             <!-- Header -->
-            <div class="mb-10 text-center md:text-left">
+            <div class="mb-10 text-center md:text-left track-enter">
                 <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-3" style="color: #3F6B2A;">Track Your
                     Report</h1>
                 <p class="text-lg max-w-2xl" style="color: #7B8F69;">Enter the tracking code you received when you
@@ -119,7 +182,7 @@
             <div class="flex flex-col md:flex-row gap-8 items-stretch">
 
                 <!-- Left Column: Form (40%) -->
-                <div class="flex-1 md:flex-[0_0_40%] flex flex-col">
+                <div class="flex-1 md:flex-[0_0_40%] flex flex-col track-enter track-enter--delay-1">
                     <form id="track-form" method="POST" action="{{ route('report.tracking.result') }}"
                         class="flex flex-col flex-1" novalidate>
                         @csrf
@@ -273,9 +336,14 @@
                 </div>
 
                 <!-- Right Column: Image (60%) -->
-                <div class="flex-1 md:flex-[0_0_60%] relative h-[280px] md:h-auto" style="min-height: 400px;">
-                    <img src="{{ asset('images/tracking-image.png') }}" alt="Environmental Protection"
-                        style="width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 20px;">
+                <div class="flex-1 md:flex-[0_0_60%] relative h-[280px] md:h-auto md:min-h-[400px] track-enter track-enter--delay-2">
+                    <x-lazy-image
+                        :src="asset('images/tracking-image.png')"
+                        alt="Environmental Protection"
+                        class="w-full h-full object-cover rounded-[20px]"
+                        height="400px"
+                        priority
+                    />
                     <div
                         style="position: absolute; inset: 0; border-radius: 20px; background: linear-gradient(to top, rgba(39,80,10,0.55) 0%, transparent 55%);">
                     </div>
@@ -303,7 +371,7 @@
 
             {{-- Scroll hint arrow — only shown when report exists --}}
             @isset($report)
-                <div class="flex justify-center mt-10">
+                <div id="scroll-hint" class="flex justify-center mt-10">
                     <button onclick="document.getElementById('report-results').scrollIntoView({behavior:'smooth'})"
                         class="bounce flex flex-col items-center gap-1 border-none bg-transparent cursor-pointer"
                         style="color: #7B8F69;">
@@ -325,7 +393,7 @@
                                 box-shadow: 0 8px 32px rgba(94,139,61,0.12);">
 
                         <!-- Result Header -->
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6"
+                        <div class="animate-item animate-delay-1 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6"
                             style="border-bottom: 1px solid rgba(94,139,61,0.15);">
                             <div>
                                 <p class="text-xs font-bold uppercase tracking-widest mb-1" style="color: #7B8F69;">Case
@@ -343,25 +411,25 @@
 
                         <dl>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="rounded-xl p-5" style="background: #F3F5EA;">
+                                <div class="animate-item animate-delay-2 rounded-xl p-5" style="background: #F3F5EA;">
                                     <dt class="text-xs font-bold mb-1 uppercase tracking-widest" style="color: #7B8F69;">
                                         Tracking Code</dt>
                                     <dd class="text-lg font-mono font-semibold" style="color: #3F6B2A;">
                                         {{ $report->tracking_code }}</dd>
                                 </div>
-                                <div class="rounded-xl p-5" style="background: #F3F5EA;">
+                                <div class="animate-item animate-delay-3 rounded-xl p-5" style="background: #F3F5EA;">
                                     <dt class="text-xs font-bold mb-1 uppercase tracking-widest" style="color: #7B8F69;">
                                         Category</dt>
                                     <dd class="text-lg font-semibold" style="color: #3F6B2A;">
                                         {{ $report->crimeCategory->name ?? '—' }}</dd>
                                 </div>
-                                <div class="rounded-xl p-5" style="background: #F3F5EA;">
+                                <div class="animate-item animate-delay-4 rounded-xl p-5" style="background: #F3F5EA;">
                                     <dt class="text-xs font-bold mb-1 uppercase tracking-widest" style="color: #7B8F69;">
                                         Priority</dt>
                                     <dd class="text-lg font-semibold" style="color: #3F6B2A;">{{ $report->priority }}
                                     </dd>
                                 </div>
-                                <div class="rounded-xl p-5" style="background: #F3F5EA;">
+                                <div class="animate-item animate-delay-5 rounded-xl p-5" style="background: #F3F5EA;">
                                     <dt class="text-xs font-bold mb-1 uppercase tracking-widest" style="color: #7B8F69;">
                                         Submitted</dt>
                                     <dd class="text-lg font-semibold" style="color: #3F6B2A;">
@@ -369,7 +437,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-6 rounded-xl p-5" style="background: #F3F5EA;">
+                            <div class="animate-item animate-delay-6 mt-6 rounded-xl p-5" style="background: #F3F5EA;">
                                 <dt class="text-xs font-bold mb-2 uppercase tracking-widest" style="color: #7B8F69;">
                                     Description</dt>
                                 <dd class="text-base leading-relaxed" style="color: #555;">{{ $report->description }}
@@ -404,20 +472,37 @@
             });
         }
 
-        // 2. Smooth reveal of results section after page loads
-        const results = document.getElementById('report-results');
-        if (results) {
-            // Small delay so the transition is visible after page paint
-            setTimeout(function() {
+        // 2. Smooth reveal of results section after page is ready
+        const revealResults = () => {
+            const results = document.getElementById('report-results');
+            const scrollHint = document.getElementById('scroll-hint');
+            if (!results || results.dataset.revealed) return;
+            results.dataset.revealed = '1';
+
+            setTimeout(() => {
                 results.classList.add('visible');
-                // Then smoothly scroll into view
-                setTimeout(function() {
-                    results.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }, 200);
-            }, 400);
+                if (scrollHint) scrollHint.classList.add('visible');
+                setTimeout(() => {
+                    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }, 350);
+        };
+
+        if (document.getElementById('report-results')) {
+            const tryReveal = () => {
+                if (document.documentElement.classList.contains('is-ready')) {
+                    revealResults();
+                    return true;
+                }
+                return false;
+            };
+
+            if (!tryReveal()) {
+                const observer = new MutationObserver(() => {
+                    if (tryReveal()) observer.disconnect();
+                });
+                observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+            }
         }
     </script>
 
@@ -450,6 +535,7 @@
             </svg>
         </button>
     @endisset
+</div>
 </body>
 
 </html>

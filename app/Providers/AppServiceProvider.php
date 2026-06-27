@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,19 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer('layouts.navigation', function () {
+            if ($user = auth()->user()) {
+                $user->loadMissing(['whistleblowerProfile', 'officerProfile', 'adminProfile']);
+            }
+        });
+
+        $verifySsl = filter_var(config('services.http.verify_ssl', true), FILTER_VALIDATE_BOOLEAN);
+        $caBundle  = config('services.http.ca_bundle');
+
+        if (! $verifySsl) {
+            Http::globalOptions(['verify' => false]);
+        } elseif (is_string($caBundle) && is_file($caBundle)) {
+            Http::globalOptions(['verify' => $caBundle]);
+        }
     }
 }

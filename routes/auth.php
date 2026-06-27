@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\StaffAuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
@@ -21,6 +22,14 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
+    Route::prefix('admin')->group(function () {
+        Route::get('/', [StaffAuthenticatedSessionController::class, 'create'])
+            ->name('admin.login');
+
+        Route::post('/', [StaffAuthenticatedSessionController::class, 'store'])
+            ->name('admin.login.store');
+    });
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');

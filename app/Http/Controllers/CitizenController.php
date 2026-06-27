@@ -9,7 +9,7 @@ class CitizenController extends Controller
     public function dashboard(): View
     {
         return view('citizen.dashboard', [
-            'reports' => auth()->user()->reports()->with(['crimeCategory', 'evidence', 'statusHistory'])->latest()->get(),
+            'reports' => auth()->user()->reports()->with(['crime', 'evidence', 'statusHistory'])->latest('created_at')->get(),
         ]);
     }
 }

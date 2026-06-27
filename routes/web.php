@@ -4,6 +4,7 @@ use App\Http\Controllers\CitizenController;
 use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SplashController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -14,11 +15,17 @@ Route::get('/dashboard', function () {
         return redirect()->route('login');
     }
 
-    return match (auth()->user()->role) {
-        'admin', 'officer' => redirect()->route('officer.dashboard'),
+    $user = auth()->user();
+
+    return match (true) {
+        $user->isAdmin(), $user->isOfficer() => redirect()->route('officer.dashboard'),
         default => redirect()->route('citizen.dashboard'),
     };
 })->middleware('auth')->name('dashboard');
+
+Route::get('/splash', [SplashController::class, 'show'])->name('splash');
+Route::get('/splash/continue', [SplashController::class, 'continue'])->name('splash.continue');
+
 Route::get('/track', [ReportController::class, 'trackAnonymous'])->name('report.track');
 Route::post('/track', [ReportController::class, 'showTracking'])->name('report.tracking.result');
 Route::get('/report/anonymous', [ReportController::class, 'createAnonymous'])->name('report.anonymous');
@@ -33,7 +40,7 @@ Route::middleware(['auth'])->prefix('citizen')->name('citizen.')->group(function
 });
 
 // Officer/Admin routes
-Route::middleware(['auth', 'role:admin,officer'])->prefix('officer')->name('officer.')->group(function () {
+Route::middleware(['auth', 'role:Admin,Officer'])->prefix('officer')->name('officer.')->group(function () {
     Route::get('/dashboard', [OfficerController::class, 'dashboard'])->name('dashboard');
     Route::get('/reports', [OfficerController::class, 'reports'])->name('reports');
     Route::get('/reports/{report}', [OfficerController::class, 'show'])->name('report.show');

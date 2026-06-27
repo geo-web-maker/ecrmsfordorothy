@@ -3,10 +3,10 @@
         <div>
             <p class="text-xs font-bold uppercase tracking-wider" style="color:#5E8B3D;">Admin & Officer Portal</p>
             <h2 class="mt-1 text-2xl font-bold" style="color:#1F3318;">
-                {{ Auth::user()->role === 'admin' ? 'Overview Dashboard' : 'My Assigned Cases' }}
+                {{ Auth::user()->isAdmin() ? 'Overview Dashboard' : 'My Assigned Cases' }}
             </h2>
             <p class="mt-1 text-sm" style="color:#5F6B57;">
-                {{ Auth::user()->role === 'admin' ? 'Platform-wide statistics and recent activity.' : 'Reports that have been assigned to you for investigation.' }}
+                {{ Auth::user()->isAdmin() ? 'Platform-wide statistics and recent activity.' : 'Reports that have been assigned to you for investigation.' }}
             </p>
         </div>
     </x-slot>
@@ -49,7 +49,7 @@
                         <svg class="w-5 h-5" style="color:#3F6B2A;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6M9 8h6M9 16h4M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
                     </div>
                     <div>
-                        <h3 class="font-bold text-sm" style="color:#1F3318;">{{ Auth::user()->role === 'admin' ? 'All Reports' : 'My Reports' }}</h3>
+                        <h3 class="font-bold text-sm" style="color:#1F3318;">{{ Auth::user()->isAdmin() ? 'All Reports' : 'My Reports' }}</h3>
                         <p class="text-xs mt-0.5" style="color:#7B8F69;">Browse and manage submitted cases</p>
                     </div>
                     <svg class="w-4 h-4 ml-auto opacity-40 group-hover:opacity-70 transition" style="color:#3F6B2A;" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 0 1 0-1.06L11.94 8H6.75a.75.75 0 0 1 0-1.5h6.5a.75.75 0 0 1 .75.75v6.5a.75.75 0 0 1-1.5 0V8.81l-4.73 4.73a.75.75 0 0 1-1.06 0z" clip-rule="evenodd"/></svg>

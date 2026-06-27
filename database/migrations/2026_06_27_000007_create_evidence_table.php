@@ -8,15 +8,22 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Creates the EVIDENCE table (sub-table of REPORT).
      */
     public function up(): void
     {
         Schema::create('evidence', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('report_id')->constrained()->cascadeOnDelete();
+            $table->increments('evidence_id');
+            $table->unsignedInteger('report_id');
+            $table->string('file_name', 255);
             $table->string('file_path', 500);
-            $table->enum('file_type', ['image', 'video']);
-            $table->timestamps();
+            $table->enum('file_type', ['image', 'video', 'audio', 'document']);
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+
+            $table->foreign('report_id')
+                  ->references('report_id')
+                  ->on('report')
+                  ->cascadeOnDelete();
         });
     }
 

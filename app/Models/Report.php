@@ -2,59 +2,88 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable([
-    'user_id',
-    'crime_category_id',
-    'description',
-    'location_latitude',
-    'location_longitude',
-    'location_address',
-    'status',
-    'priority',
-    'tracking_code',
-])]
 class Report extends Model
 {
-    public function user(): BelongsTo
+    protected $table = 'report';
+
+    protected $primaryKey = 'report_id';
+
+    /**
+     * Only created_at is used (no updated_at per schema spec).
+     */
+    const UPDATED_AT = null;
+
+    protected $fillable = [
+        'stuff_id',
+        'crime_id',
+        'description',
+        'status',
+        'priority',
+        'tracking_code',
+        'reporter_phone',
+    ];
+
+    /**
+     * Alias for views and routes that reference ->id.
+     */
+    public function getIdAttribute(): ?int
     {
-        return $this->belongsTo(User::class);
+        return $this->report_id;
     }
 
-    public function crimeCategory(): BelongsTo
+    public function stuff(): BelongsTo
     {
-        return $this->belongsTo(CrimeCategory::class);
+        return $this->belongsTo(Stuff::class, 'stuff_id', 'stuff_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->stuff();
+    }
+
+    public function crime(): BelongsTo
+    {
+        return $this->belongsTo(Crime::class, 'crime_id', 'crime_id');
+    }
+
+    /**
+     * Backward-compatible accessor for views referencing crime category name.
+     */
+    public function getCrimeCategoryAttribute(): ?object
+    {
+        if (! $this->relationLoaded('crime')) {
+            $this->loadMissing('crime');
+        }
+
+        if (! $this->crime) {
+            return null;
+        }
+
+        return (object) ['name' => $this->crime->category_name];
     }
 
     public function evidence(): HasMany
     {
-        return $this->hasMany(Evidence::class);
+        return $this->hasMany(Evidence::class, 'report_id', 'report_id');
     }
 
     public function caseAssignments(): HasMany
     {
-        return $this->hasMany(CaseAssignment::class);
+        return $this->hasMany(Caseassignment::class, 'report_id', 'report_id');
     }
 
     public function statusHistory(): HasMany
     {
-        return $this->hasMany(StatusHistory::class);
+        return $this->hasMany(Status::class, 'report_id', 'report_id')
+            ->latest('changed_at');
     }
 
-    public function crimeNotifications(): HasMany
+    public function notifications(): HasMany
     {
-        return $this->hasMany(Notification::class);
-    }
-
-    protected function casts(): array
-    {
-        return [
-            'location_latitude' => 'decimal:8',
-            'location_longitude' => 'decimal:8',
-        ];
+        return $this->hasMany(Notification::class, 'report_id', 'report_id');
     }
 }
