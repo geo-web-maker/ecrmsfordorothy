@@ -16,17 +16,17 @@ class EnsureSplashSeen
         if (! $request->isMethod('GET')) {
             return $next($request);
         }
-
-        if ($request->routeIs('splash', 'splash.continue')) {
+    
+        if ($request->routeIs('splash', 'splash.continue', 'admin.login', 'login', 'register')) {
             return $next($request);
         }
-
+    
         if ($request->session()->get('splash_seen')) {
             return $next($request);
         }
-
+    
         $request->session()->put('splash_intended_url', $request->fullUrl());
-
+    
         return redirect()->route('splash');
     }
 }
