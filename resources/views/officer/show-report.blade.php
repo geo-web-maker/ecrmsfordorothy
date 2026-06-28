@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Facades\Storage; @endphp
 <x-officer-admin-layout active-nav="reports" page-title="Report #{{ $report->id }}">
     <div class="p-4 sm:p-6 max-w-6xl mx-auto w-full">
         <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -62,9 +63,9 @@
                             @foreach ($report->evidence as $item)
                                 <div class="rounded-xl border border-portal-outline-variant overflow-hidden">
                                     @if ($item->file_type === 'image')
-                                        <a href="{{ asset('storage/'.$item->file_path) }}" target="_blank">
+                                        <a href="{{ Storage::url($item->file_path) }}" target="_blank">
                                             <x-lazy-image
-                                                :src="asset('storage/'.$item->file_path)"
+                                                :src="Storage::url($item->file_path)"
                                                 alt="Evidence"
                                                 class="h-28 sm:h-36 w-full object-cover hover:scale-105 transition duration-300"
                                                 height="9rem"
@@ -73,7 +74,7 @@
                                     @else
                                         <div class="lazy-media" data-lazy-media style="min-height: 9rem;">
                                             <div class="lazy-media__skeleton skeleton skeleton-shimmer" aria-hidden="true"></div>
-                                            <video src="{{ asset('storage/'.$item->file_path) }}" controls preload="none" class="lazy-media__video h-28 sm:h-36 w-full object-cover"></video>
+                                            <video src="{{ Storage::url($item->file_path) }}" controls preload="none" class="lazy-media__video h-28 sm:h-36 w-full object-cover"></video>
                                         </div>
                                     @endif
                                 </div>
