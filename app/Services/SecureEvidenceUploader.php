@@ -185,42 +185,37 @@ class SecureEvidenceUploader
 
     private function storeSanitizedImage(UploadedFile $file, string $mime): string
     {
-        // Image decoding with GD is memory-intensive (a 5 MB JPEG may need ~150 MB).
-        // Raise the limit for this request if the current ceiling is too low.
         $currentBytes = $this->parseMemoryLimit(ini_get('memory_limit'));
         if ($currentBytes !== -1 && $currentBytes < 512 * 1024 * 1024) {
             ini_set('memory_limit', '512M');
         }
-
+    
         $extension    = $mime === 'image/png' ? 'png' : 'jpg';
         $filename     = Str::uuid() . '.' . $extension;
         $relativePath = 'evidence/' . $filename;
-        $absolutePath = Storage::disk('public')->path($relativePath);
-
-        Storage::disk('public')->makeDirectory('evidence');
-
+    
         try {
             $driver  = extension_loaded('gd') ? new GdDriver() : new ImagickDriver();
             $manager = new ImageManager($driver);
             $image   = $manager->read($file->getRealPath());
-
-            if ($extension === 'png') {
-                $image->toPng()->save($absolutePath);
-            } else {
-                $image->toJpeg(85)->save($absolutePath);
-            }
+    
+            // Encode to bytes in memory instead of saving to local path
+            $encoded = $extension === 'png'
+                ? (string) $image->toPng()
+                : (string) $image->toJpeg(85);
+    
         } catch (\Throwable $e) {
             Log::error('SecureEvidenceUploader image processing failed', [
                 'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
                 'file'    => $file->getClientOriginalName(),
             ]);
-
             throw ValidationException::withMessages([
                 'evidence' => 'The image could not be processed safely. Please upload a different file.',
             ]);
         }
-
+    
+        Storage::disk(config('filesystems.default'))->put($relativePath, $encoded, 'public');
+    
         return $relativePath;
     }
 
@@ -228,13 +223,14 @@ class SecureEvidenceUploader
     {
         $extension    = in_array($mime, ['video/quicktime', 'video/x-quicktime'], true) ? 'mov' : 'mp4';
         $relativePath = 'evidence/' . Str::uuid() . '.' . $extension;
-
-        Storage::disk('public')->putFileAs(
+    
+        Storage::disk(config('filesystems.default'))->putFileAs(
             'evidence',
             $file,
-            basename($relativePath)
+            basename($relativePath),
+            'public'
         );
-
+    
         return $relativePath;
     }
 
