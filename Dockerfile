@@ -1,4 +1,4 @@
-FROM php:8-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Install system deps
 RUN apk add --no-cache nginx supervisor curl unzip git nodejs npm \
