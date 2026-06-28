@@ -61,6 +61,6 @@ class AuthenticationTest extends TestCase
         $response = $this->actingAs($user)->post('/logout');
 
         $this->assertGuest();
-        $response->assertRedirect(route('home', absolute: false));
+        $response->assertRedirect(route('splash', absolute: false));
     }
 }

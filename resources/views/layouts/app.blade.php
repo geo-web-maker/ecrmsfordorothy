@@ -204,6 +204,7 @@
             /* ── Prevent horizontal scroll on mobile ──── */
             .overflow-x-safe { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         </style>
+        @stack('styles')
     </head>
     <body>
         @include('partials.page-skeleton')
@@ -227,5 +228,6 @@
             </main>
         </div>
         @stack('scripts')
+        @include('partials.logout-confirm')
     </body>
 </html>

@@ -55,15 +55,13 @@ class StaffAuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_staff_logout_redirects_to_staff_login(): void
+    public function test_staff_logout_redirects_to_splash_then_home(): void
     {
         $user = Stuff::factory()->admin()->create();
 
-        $response = $this->actingAs($user)->post('/logout', [
-            'redirect' => '/admin',
-        ]);
+        $response = $this->actingAs($user)->post('/logout');
 
         $this->assertGuest();
-        $response->assertRedirect('/admin');
+        $response->assertRedirect(route('splash', absolute: false));
     }
 }

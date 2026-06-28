@@ -213,32 +213,6 @@
 
                 <hr class="border-none my-8" style="border-top: 1.5px solid rgba(94,139,61,0.12);">
 
-                <!-- Section: SMS tracking -->
-                <div class="text-[0.7rem] font-bold uppercase tracking-[1px] text-[#7B8F69] mb-5 flex items-center gap-2">
-                    Receive Your Tracking Code
-                    <div class="flex-1 h-px" style="background: rgba(94,139,61,0.15);"></div>
-                </div>
-
-                <p class="flex items-start gap-2 mb-4 text-[0.82rem] leading-relaxed text-[#5F6B57] px-4 py-3 rounded-2xl"
-                   style="background: rgba(94,139,61,0.08); border: 1px solid rgba(94,139,61,0.18);">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5E8B3D" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    <span>Your identity stays anonymous. We only use your phone number to send your <strong style="color:#3F6B2A;">tracking code</strong> and case status updates by SMS.</span>
-                </p>
-
-                <div class="mb-[1.6rem]">
-                    <label class="flex items-center gap-[0.45rem] text-sm font-semibold text-[#9aad8a] mb-2" for="reporter_phone">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                        Phone Number
-                    </label>
-                    <input type="tel" name="reporter_phone" id="reporter_phone" value="{{ old('reporter_phone') }}" required autocomplete="tel" placeholder="e.g. 07XX XXX XXX or +2567XX XXX XXX" class="w-full text-gray-900 font-sans text-[0.93rem] outline-none px-5 py-[0.85rem] border-2 rounded-full border-[rgba(94,139,61,0.22)] bg-[rgba(255,255,255,0.80)] transition-all hover:border-[rgba(94,139,61,0.45)] focus:bg-white focus:border-[#5E8B3D] focus:ring-2 focus:ring-[rgba(94,139,61,0.12)] @error('reporter_phone') border-[rgba(192,57,43,0.55)] @enderror">
-                    @error('reporter_phone')
-                        <div class="flex items-center gap-[0.35rem] text-[0.78rem] mt-[0.4rem] pl-2 text-red-600">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-
                 <!-- Submit -->
                 <button type="submit" class="w-full text-white font-sans text-base font-bold border-none rounded-full cursor-pointer flex items-center justify-center gap-[0.6rem] mt-2 px-8 py-4 transition-all hover:-translate-y-0.5" style="background: #5E8B3D; box-shadow: 0 6px 20px rgba(94,139,61,0.35);" onmouseover="this.style.background='#3F6B2A'; this.style.boxShadow='0 10px 28px rgba(63,107,42,0.40)';" onmouseout="this.style.background='#5E8B3D'; this.style.boxShadow='0 6px 20px rgba(94,139,61,0.35)';">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -266,7 +240,7 @@
         <!-- Footer note -->
         <div class="text-center mt-6 text-[0.82rem] text-gray-600 flex items-center justify-center gap-[0.4rem]" style="animation: fadeInUp 0.8s ease-out 0.35s both;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            After submission, you will see your tracking code on screen and receive a copy by SMS.
+            After submission, your tracking code will appear in an on-screen notification — save it to track your case.
         </div>
 
     </div>

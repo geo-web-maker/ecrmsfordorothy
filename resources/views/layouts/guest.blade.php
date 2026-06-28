@@ -23,5 +23,6 @@
                 {{ $slot }}
             </div>
         </div>
+        @include('partials.logout-confirm')
     </body>
 </html>

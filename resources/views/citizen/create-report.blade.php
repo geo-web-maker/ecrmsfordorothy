@@ -410,5 +410,6 @@
             showStep(1);
         })();
     </script>
+    @include('partials.logout-confirm')
 </body>
 </html>

@@ -17,12 +17,15 @@ class SplashController extends Controller
 
         return view('splash', [
             'continueUrl' => route('splash.continue'),
+            'fromLogout'  => (bool) $request->session()->get('splash_from_logout', false),
+            'autoDelayMs' => $request->session()->get('splash_from_logout', false) ? 3500 : 6500,
         ]);
     }
 
     public function continue(Request $request): RedirectResponse
     {
         $request->session()->put('splash_seen', true);
+        $request->session()->forget('splash_from_logout');
 
         $destination = $this->destinationUrl($request);
         $request->session()->forget('splash_intended_url');

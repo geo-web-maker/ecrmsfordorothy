@@ -4,12 +4,33 @@
     @keydown.escape.window="open = false"
     class="app-nav-shell relative z-[10000]"
 >
+    <style>
+        @keyframes shakeNudge {
+            0%, 100% { transform: translateX(0); }
+            10% { transform: translateX(-6px); }
+            20% { transform: translateX(6px); }
+            30% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            50% { transform: translateX(-3px); }
+            60% { transform: translateX(3px); }
+            70% { transform: translateX(0); }
+        }
+
+        .navbar-logo {
+            animation: shakeNudge 3.5s ease-in-out infinite;
+            display: inline-flex;
+        }
+
+        .navbar-logo:hover {
+            animation: none;
+        }
+    </style>
     <nav style="background: white; border-bottom: 1px solid rgba(94,139,61,0.15); box-shadow: 0 1px 3px rgba(63,107,42,0.06);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <div class="shrink-0 flex items-center">
-                        <a href="{{ route('dashboard') }}" class="flex items-center gap-2 font-extrabold text-lg tracking-tight" style="text-decoration:none; color:#1F3318;">
+                        <a href="{{ route('dashboard') }}" class="navbar-logo flex items-center gap-2 font-extrabold text-lg tracking-tight" style="text-decoration:none; color:#1F3318;">
                             🌿 NEMA <span style="color:#5E8B3D;">eCRMS</span>
                         </a>
                     </div>
@@ -53,16 +74,13 @@
 
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                @if (Auth::user()->isAdmin() || Auth::user()->isOfficer())
-                                    <input type="hidden" name="redirect" value="/admin">
-                                @endif
-                                <x-dropdown-link :href="route('logout')"
-                                        onclick="event.preventDefault(); this.closest('form').submit();">
+                                <button type="submit"
+                                        class="block w-full px-4 py-2.5 text-start text-sm leading-5 hover:bg-[#F3F5EA] focus:outline-none transition duration-150 ease-in-out border-none bg-transparent cursor-pointer">
                                     <span class="flex items-center gap-2 text-sm font-medium" style="color:#c0392b;">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                                         {{ __('Log Out') }}
                                     </span>
-                                </x-dropdown-link>
+                                </button>
                             </form>
                         </x-slot>
                     </x-dropdown>
@@ -142,9 +160,6 @@
 
             <form method="POST" action="{{ route('logout') }}" class="mt-6 px-3">
                 @csrf
-                @if (Auth::user()->isAdmin() || Auth::user()->isOfficer())
-                    <input type="hidden" name="redirect" value="/admin">
-                @endif
                 <button type="submit" class="w-full font-semibold text-sm cursor-pointer rounded-full px-5 py-3 transition-all" style="background: rgba(220, 53, 69, 0.08); color: #c0392b; border: 1.5px solid rgba(220, 53, 69, 0.3);">
                     Log Out
                 </button>

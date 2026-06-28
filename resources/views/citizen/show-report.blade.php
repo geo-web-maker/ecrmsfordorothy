@@ -52,6 +52,12 @@
                             <dd class="mt-1 font-semibold" style="color:#1F3318;">{{ $report->location_address }}</dd>
                         </div>
                     @endif
+                    @if ($report->mapLatitude() && $report->mapLongitude())
+                        <div class="sm:col-span-2">
+                            <dt class="text-xs font-bold uppercase tracking-wider" style="color:#7B8F69;">Coordinates</dt>
+                            <dd class="mt-1 font-mono text-sm font-semibold" style="color:#1F3318;">{{ $report->mapLatitude() }}, {{ $report->mapLongitude() }}</dd>
+                        </div>
+                    @endif
                     <div class="sm:col-span-2">
                         <dt class="text-xs font-bold uppercase tracking-wider mb-2" style="color:#7B8F69;">Description</dt>
                         <dd class="rounded-xl border p-4 text-sm leading-relaxed whitespace-pre-wrap"

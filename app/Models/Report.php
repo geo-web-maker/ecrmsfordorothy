@@ -21,11 +21,21 @@ class Report extends Model
         'stuff_id',
         'crime_id',
         'description',
+        'location_address',
+        'location_latitude',
+        'location_longitude',
         'status',
         'priority',
         'tracking_code',
-        'reporter_phone',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'location_latitude'  => 'decimal:8',
+            'location_longitude' => 'decimal:8',
+        ];
+    }
 
     /**
      * Alias for views and routes that reference ->id.
@@ -64,6 +74,37 @@ class Report extends Model
         }
 
         return (object) ['name' => $this->crime->category_name];
+    }
+
+    public function mapLatitude(): ?float
+    {
+        if ($this->location_latitude !== null) {
+            return (float) $this->location_latitude;
+        }
+
+        if ($this->crime?->latitude !== null) {
+            return (float) $this->crime->latitude;
+        }
+
+        return null;
+    }
+
+    public function mapLongitude(): ?float
+    {
+        if ($this->location_longitude !== null) {
+            return (float) $this->location_longitude;
+        }
+
+        if ($this->crime?->longitude !== null) {
+            return (float) $this->crime->longitude;
+        }
+
+        return null;
+    }
+
+    public function hasMapCoordinates(): bool
+    {
+        return $this->mapLatitude() !== null && $this->mapLongitude() !== null;
     }
 
     public function evidence(): HasMany

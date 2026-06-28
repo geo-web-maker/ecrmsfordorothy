@@ -49,20 +49,15 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $wasStaff = auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isOfficer());
-
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        $redirect = $request->string('redirect')->toString();
+        $request->session()->forget('splash_seen');
+        $request->session()->put('splash_from_logout', true);
+        $request->session()->put('splash_intended_url', route('home'));
 
-        if ($redirect !== '' && str_starts_with($redirect, '/')) {
-            return redirect($redirect);
-        }
-
-        return redirect($wasStaff ? route('admin.login') : route('home'));
+        return redirect()->route('splash');
     }
 }

@@ -19,7 +19,7 @@ class AdminUserSeeder extends Seeder
         $adminStuff = Stuff::updateOrCreate(
             ['email' => 'admin@nema.go.ug'],
             [
-                'password' => Hash::make('Admin@12345'),
+                'password' => Hash::make('admin123'),
                 'role'     => 'Admin',
                 'is_active' => true,
             ]
@@ -33,7 +33,7 @@ class AdminUserSeeder extends Seeder
         $officer1Stuff = Stuff::updateOrCreate(
             ['email' => 'officer1@nema.go.ug'],
             [
-                'password'  => Hash::make('Officer@12345'),
+                'password'  => Hash::make('officer1'),
                 'role'      => 'Officer',
                 'is_active' => true,
             ]
@@ -46,7 +46,7 @@ class AdminUserSeeder extends Seeder
         $officer2Stuff = Stuff::updateOrCreate(
             ['email' => 'officer2@nema.go.ug'],
             [
-                'password'  => Hash::make('Officer@12345'),
+                'password'  => Hash::make('officer1'),
                 'role'      => 'Officer',
                 'is_active' => true,
             ]

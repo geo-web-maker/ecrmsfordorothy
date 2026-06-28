@@ -18,13 +18,24 @@
             box-shadow: inset 0 2px 4px rgba(63,107,42,0.10), 0 0 0 4px rgba(94,139,61,0.18) !important;
         }
 
+        @keyframes attractRegister {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(94,139,61,0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px 5px rgba(94,139,61,0.3); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(94,139,61,0); }
+        }
+
+        .register-btn {
+            animation: attractRegister 2.5s ease-in-out infinite;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+
         .register-btn:hover {
+            animation-play-state: paused;
             background: #2d4f1f !important;
             box-shadow: 0 6px 24px rgba(63,107,42,0.40) !important;
-            transform: translateY(-1px);
+            transform: translateY(-1px) scale(1.05);
         }
-        .register-btn:active { transform: translateY(0); }
-        .register-btn { transition: background 0.2s, box-shadow 0.2s, transform 0.2s; }
+        .register-btn:active { transform: translateY(0) scale(1); }
 
         .deco-circle {
             position: absolute;
@@ -113,7 +124,7 @@
                 </div>
                 <div style="padding-top:3px;">
                     <p style="font-size:12px; font-weight:700; color:white; margin:0;">Create your account</p>
-                    <p style="font-size:11px; color:rgba(221,232,200,0.6); margin:0;">Fill in your name, email, phone and password</p>
+                    <p style="font-size:11px; color:rgba(221,232,200,0.6); margin:0;">Fill in your name, email and password</p>
                 </div>
             </div>
             <div class="flex items-start gap-3">
@@ -218,38 +229,6 @@
                         style="padding:11px 16px; border-radius:12px; border:2px solid #5E8B3D; background:#DDE8C8; font-size:14px; color:#3F6B2A; font-weight:600; transition:all 0.2s; box-shadow:inset 0 2px 4px rgba(63,107,42,0.06);"
                     >
                     @error('email')
-                        <div class="flex items-center gap-1.5 mt-1.5" style="font-size:11px; font-weight:600; color:#c0392b;">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-
-                <!-- Phone -->
-                <div class="mb-4">
-                    <p class="flex items-start gap-2 mb-3"
-                       style="font-size:11px; line-height:1.5; color:#5F6B57; margin:0 0 12px; padding:10px 12px; border-radius:10px; background:rgba(94,139,61,0.08); border:1px solid rgba(94,139,61,0.18);">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5E8B3D" stroke-width="2.5" style="flex-shrink:0; margin-top:1px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                        <span>Your phone number will be used to send <strong style="color:#3F6B2A;">SMS tracking codes</strong> and case status updates.</span>
-                    </p>
-                    <label for="phone_number"
-                           class="flex items-center gap-1.5 mb-2"
-                           style="font-size:10px; font-weight:700; color:#3F6B2A; letter-spacing:1.2px; text-transform:uppercase;">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                        Phone number
-                    </label>
-                    <input
-                        id="phone_number"
-                        type="tel"
-                        name="phone_number"
-                        value="{{ old('phone_number') }}"
-                        required
-                        autocomplete="tel"
-                        placeholder="e.g. 07XX XXX XXX or +2567XX XXX XXX"
-                        class="green-input w-full"
-                        style="padding:11px 16px; border-radius:12px; border:2px solid #5E8B3D; background:#DDE8C8; font-size:14px; color:#3F6B2A; font-weight:600; transition:all 0.2s; box-shadow:inset 0 2px 4px rgba(63,107,42,0.06);"
-                    >
-                    @error('phone_number')
                         <div class="flex items-center gap-1.5 mt-1.5" style="font-size:11px; font-weight:600; color:#c0392b;">
                             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                             {{ $message }}

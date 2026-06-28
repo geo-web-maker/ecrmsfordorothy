@@ -18,7 +18,8 @@ Route::get('/dashboard', function () {
     $user = auth()->user();
 
     return match (true) {
-        $user->isAdmin(), $user->isOfficer() => redirect()->route('officer.dashboard'),
+        $user->isAdmin() => redirect()->route('officer.dashboard'),
+        $user->isOfficer() => redirect()->route('officer.reports'),
         default => redirect()->route('citizen.dashboard'),
     };
 })->middleware('auth')->name('dashboard');

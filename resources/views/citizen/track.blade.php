@@ -103,6 +103,47 @@
             animation: bounce 1.4s ease-in-out infinite;
         }
 
+        /* Track hero image — mobile: crop to photo, keep badge on image */
+        .track-image-col {
+            overflow: hidden;
+        }
+
+        .track-image-col .lazy-media {
+            height: 100%;
+            min-height: 100% !important;
+        }
+
+        @media (max-width: 767px) {
+            .track-image-col {
+                height: 210px;
+            }
+
+            .track-image-col .lazy-media__img {
+                object-position: top center;
+            }
+
+            .track-image-badge {
+                bottom: 10px !important;
+                left: 12px !important;
+                padding: 8px 12px !important;
+            }
+
+            .track-image-badge span {
+                font-size: 11px !important;
+            }
+
+            .track-protected-badge {
+                top: 10px !important;
+                right: 10px !important;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .track-image-col {
+                min-height: 400px;
+            }
+        }
+
         /* Button loading spinner */
         @keyframes spin {
             to {
@@ -179,7 +220,7 @@
             @include('partials.flash')
 
             <!-- Two-Column Layout -->
-            <div class="flex flex-col md:flex-row gap-8 items-stretch">
+            <div class="flex flex-col md:flex-row gap-4 md:gap-8 items-stretch">
 
                 <!-- Left Column: Form (40%) -->
                 <div class="flex-1 md:flex-[0_0_40%] flex flex-col track-enter track-enter--delay-1">
@@ -336,34 +377,35 @@
                 </div>
 
                 <!-- Right Column: Image (60%) -->
-                <div class="flex-1 md:flex-[0_0_60%] relative h-[280px] md:h-auto md:min-h-[400px] track-enter track-enter--delay-2">
+                <div class="track-image-col flex-1 md:flex-[0_0_60%] relative md:h-auto track-enter track-enter--delay-2">
                     <x-lazy-image
                         :src="asset('images/tracking-image.png')"
                         alt="Environmental Protection"
                         class="w-full h-full object-cover rounded-[20px]"
-                        height="400px"
+                        height="auto"
                         priority
                     />
                     <div
                         style="position: absolute; inset: 0; border-radius: 20px; background: linear-gradient(to top, rgba(39,80,10,0.55) 0%, transparent 55%);">
                     </div>
                     <div
-                        style="position: absolute; bottom: 20px; left: 20px; background: rgba(255,255,255,0.92); border-radius: 10px; padding: 8px 14px; display: flex; align-items: center; gap: 6px; backdrop-filter: blur(4px);">
+                        class="track-image-badge"
+                        style="position: absolute; bottom: 20px; left: 20px; background: rgba(255,255,255,0.92); border-radius: 10px; padding: 10px 16px; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(4px); max-width: calc(100% - 40px);">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3F6B2A"
-                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                             <circle cx="12" cy="10" r="3" />
                         </svg>
-                        <span style="font-size: 11px; font-weight: 700; color: #3F6B2A;">Uganda Environmental
-                            Watch</span>
+                        <span style="font-size: 12px; font-weight: 600; color: #3F6B2A; white-space: nowrap; letter-spacing: 0.01em;">Uganda Environmental Watch</span>
                     </div>
                     <div
-                        style="position: absolute; top: 16px; right: 16px; background: #5E8B3D; border-radius: 20px; padding: 5px 14px; display: flex; align-items: center; gap: 5px;">
+                        class="track-protected-badge"
+                        style="position: absolute; top: 16px; right: 16px; background: #5E8B3D; border-radius: 20px; padding: 6px 14px; display: flex; align-items: center; gap: 6px;">
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white"
-                            stroke-width="2.5">
+                            stroke-width="2.5" style="flex-shrink: 0;">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                         </svg>
-                        <span style="font-size: 11px; font-weight: 700; color: white;">Protected Reporting</span>
+                        <span style="font-size: 11px; font-weight: 600; color: white; white-space: nowrap; letter-spacing: 0.02em;">Protected Reporting</span>
                     </div>
                 </div>
 

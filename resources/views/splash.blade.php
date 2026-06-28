@@ -67,8 +67,12 @@
                 </svg>
                 100% Anonymous &amp; End-to-End Encrypted
             </p>
-            <p class="text-sm text-[#a1f4c8]/90 splash-hint-pulse animate-pulse font-medium">
-                Tap anywhere to continue
+            <p class="text-sm text-[#a1f4c8]/90 splash-hint-pulse {{ ($fromLogout ?? false) ? '' : 'animate-pulse' }} font-medium">
+                @if ($fromLogout ?? false)
+                    Logging you out securely&hellip;
+                @else
+                    Tap anywhere to continue
+                @endif
             </p>
             <p class="text-[10px] text-[#86af99]/40 uppercase tracking-[0.2em] font-medium">
                 Official Government Portal
@@ -79,7 +83,8 @@
     <script>
         (() => {
             const continueUrl = @json($continueUrl);
-            const delayMs = 6500;
+            const delayMs = @json($autoDelayMs ?? 6500);
+            const fromLogout = @json($fromLogout ?? false);
             let dismissed = false;
 
             function revealSplash() {
@@ -99,12 +104,14 @@
             }
 
             document.getElementById('splash-screen').addEventListener('click', continueToApp);
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    continueToApp();
-                }
-            });
+            if (!fromLogout) {
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        continueToApp();
+                    }
+                });
+            }
 
             window.setTimeout(continueToApp, delayMs);
         })();

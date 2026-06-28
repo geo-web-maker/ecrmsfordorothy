@@ -1,119 +1,240 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div>
-            <p class="text-xs font-bold uppercase tracking-wider" style="color:#5E8B3D;">{{ Auth::user()->isAdmin() ? 'Admin Portal' : 'Officer Portal' }}</p>
-            <h2 class="mt-1 text-2xl font-bold" style="color:#1F3318;">
-                {{ Auth::user()->isAdmin() ? 'All Reports' : 'My Assigned Reports' }}
-            </h2>
-            <p class="mt-1 text-sm" style="color:#5F6B57;">
-                Browse, filter, and take action on submitted environmental crime reports.
-            </p>
+@php
+    $priorityStyles = [
+        'Urgent'   => 'bg-red-100 text-red-800',
+        'Critical' => 'bg-red-100 text-red-800',
+        'High'     => 'bg-portal-secondary-container text-portal-on-secondary-container',
+        'Medium'   => 'bg-gray-200 text-gray-700',
+        'Low'      => 'bg-gray-100 text-gray-600',
+    ];
+    $statusDots = [
+        'Submitted'     => 'bg-yellow-500',
+        'Under Review'  => 'bg-green-500',
+        'Assigned'      => 'bg-blue-500',
+        'Resolved'      => 'bg-emerald-600',
+        'Closed'        => 'bg-gray-400',
+    ];
+    $categoryIcons = [
+        'logging' => 'forest',
+        'wetland' => 'water_drop',
+        'pollution' => 'water_drop',
+        'encroach' => 'fence',
+        'poach' => 'pets',
+    ];
+    $resolveIcon = function (?string $name) use ($categoryIcons) {
+        $lower = strtolower($name ?? '');
+        foreach ($categoryIcons as $key => $icon) {
+            if (str_contains($lower, $key)) {
+                return $icon;
+            }
+        }
+        return 'eco';
+    };
+@endphp
+
+<x-officer-admin-layout active-nav="reports" :page-title="Auth::user()->isAdmin() ? 'Incident Queue' : 'My Assigned Cases'">
+    <div class="p-4 sm:p-6 max-w-[1200px] mx-auto w-full space-y-6">
+        @include('partials.flash')
+
+        {{-- Page header --}}
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-portal-on-surface m-0">
+                    {{ Auth::user()->isAdmin() ? 'Incident Queue' : 'My Assigned Cases' }}
+                </h1>
+                <p class="text-sm text-portal-on-surface-variant mt-1 mb-0">
+                    Reviewing {{ number_format($totalCount) }} environmental protection report{{ $totalCount === 1 ? '' : 's' }}.
+                </p>
+            </div>
+            <div class="inline-flex items-center gap-2 text-xs font-semibold text-portal-secondary bg-portal-secondary-container px-3 py-1.5 rounded-full border border-portal-secondary/20 self-start">
+                <span class="material-symbols-outlined text-sm filled">verified_user</span>
+                Secure Encrypted Session Active
+            </div>
         </div>
-    </x-slot>
 
-    <div class="py-10" style="background:#F3F5EA;">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            @include('partials.flash')
+        {{-- Filters --}}
+        <form method="GET" action="{{ route('officer.reports') }}" class="bg-white border border-portal-outline-variant p-4 sm:p-6 rounded-lg shadow-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="text-xs font-semibold text-portal-on-surface-variant block mb-1">Category</label>
+                    <select name="category" class="w-full border-portal-outline-variant rounded-lg text-sm focus:ring-portal-secondary focus:border-portal-secondary">
+                        <option value="">All Categories</option>
+                        @foreach ($categories as $cat)
+                            <option value="{{ $cat }}" @selected(request('category') === $cat)>{{ $cat }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-portal-on-surface-variant block mb-1">Status</label>
+                    <select name="status" class="w-full border-portal-outline-variant rounded-lg text-sm focus:ring-portal-secondary focus:border-portal-secondary">
+                        <option value="">All Statuses</option>
+                        @foreach (['Submitted', 'Under Review', 'Assigned', 'Resolved', 'Closed'] as $s)
+                            <option value="{{ $s }}" @selected(request('status') === $s)>{{ $s }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-portal-on-surface-variant block mb-1">Priority</label>
+                    <select name="priority" class="w-full border-portal-outline-variant rounded-lg text-sm focus:ring-portal-secondary focus:border-portal-secondary">
+                        <option value="">All Priorities</option>
+                        @foreach (['Urgent', 'High', 'Medium', 'Low'] as $p)
+                            <option value="{{ $p }}" @selected(request('priority') === $p)>{{ $p }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex items-end gap-2">
+                    <button type="submit" class="flex-grow h-11 bg-portal-ink text-white rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+                        <span class="material-symbols-outlined text-lg">filter_list</span>
+                        Apply Filters
+                    </button>
+                    <a href="{{ route('officer.reports') }}" class="w-11 h-11 border border-portal-outline-variant rounded-lg flex items-center justify-center text-portal-on-surface-variant hover:bg-portal-surface transition-colors" title="Clear filters">
+                        <span class="material-symbols-outlined">refresh</span>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-3 sm:hidden">
+                <input type="search" name="q" value="{{ request('q') }}" placeholder="Search report ID…"
+                       class="w-full border-portal-outline-variant rounded-lg text-sm px-3 py-2 focus:ring-portal-secondary focus:border-portal-secondary">
+            </div>
+        </form>
 
-            {{-- Status Filters --}}
-            <div class="mb-5 flex flex-wrap gap-2" id="status-filters">
-                <button type="button" data-filter="all"
-                        class="filter-btn rounded-full px-3 py-1 text-xs font-bold transition"
-                        style="background:#3F6B2A; color:white;">All</button>
-                @foreach (['Submitted', 'Under Review', 'Assigned', 'Resolved', 'Closed'] as $s)
-                    <button type="button" data-filter="{{ $s }}"
-                            class="filter-btn rounded-full px-3 py-1 text-xs font-bold transition"
-                            style="background:#EAF1DD; color:#3F6B2A;">{{ $s }}</button>
-                @endforeach
+        {{-- Incident table (desktop) + cards (mobile) --}}
+        <div class="bg-white border border-portal-outline-variant rounded-lg overflow-hidden shadow-sm">
+            {{-- Mobile: horizontal-style cards --}}
+            <div class="md:hidden divide-y divide-portal-outline-variant">
+                @forelse ($reports as $report)
+                    @include('partials.officer-report-mobile-card', [
+                        'report' => $report,
+                        'showLocation' => true,
+                        'priorityStyles' => $priorityStyles,
+                        'statusDots' => $statusDots,
+                        'resolveIcon' => $resolveIcon,
+                    ])
+                @empty
+                    <p class="px-4 py-12 text-center text-sm text-portal-on-surface-variant m-0">
+                        {{ Auth::user()->isOfficer() ? 'No cases have been assigned to you yet.' : 'No reports match your filters.' }}
+                    </p>
+                @endforelse
             </div>
 
-            {{-- Mobile: Cards --}}
-            <div class="space-y-3 sm:hidden" id="report-cards">
-                @foreach ($reports as $report)
-                    <div class="report-row rounded-2xl border bg-white p-4 shadow-sm" data-status="{{ $report->status }}"
-                         style="border-color:rgba(94,139,61,0.15);">
-                        <div class="flex items-start justify-between gap-2">
-                            <div class="min-w-0">
-                                <p class="text-sm font-extrabold" style="color:#1F3318;">#{{ $report->id }}</p>
-                                <p class="text-sm font-semibold mt-0.5 truncate" style="color:#3F6B2A;">{{ $report->crimeCategory->name ?? '—' }}</p>
-                                <p class="text-xs mt-0.5" style="color:#7B8F69;">{{ $report->user->name ?? 'Anonymous' }}</p>
-                                <div class="flex flex-wrap items-center gap-2 mt-2">
-                                    @include('partials.status-badge', ['status' => $report->status])
+            {{-- Desktop: table --}}
+            <div class="hidden md:block overflow-x-auto officer-admin-scrollbar-hide">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-portal-surface border-b border-portal-outline-variant">
+                            <th class="px-4 sm:px-6 py-3 text-xs font-semibold text-portal-on-surface-variant uppercase tracking-wider">ID</th>
+                            <th class="px-4 sm:px-6 py-3 text-xs font-semibold text-portal-on-surface-variant uppercase tracking-wider">Incident Type</th>
+                            <th class="px-4 sm:px-6 py-3 text-xs font-semibold text-portal-on-surface-variant uppercase tracking-wider">Location</th>
+                            <th class="px-4 sm:px-6 py-3 text-xs font-semibold text-portal-on-surface-variant uppercase tracking-wider">Timestamp</th>
+                            <th class="px-4 sm:px-6 py-3 text-xs font-semibold text-portal-on-surface-variant uppercase tracking-wider">Priority</th>
+                            <th class="px-4 sm:px-6 py-3 text-xs font-semibold text-portal-on-surface-variant uppercase tracking-wider">Status</th>
+                            <th class="px-4 sm:px-6 py-3 text-xs font-semibold text-portal-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-portal-outline-variant">
+                        @forelse ($reports as $report)
+                            <tr class="officer-incident-row hover:bg-portal-surface group">
+                                <td class="px-4 sm:px-6 py-4 text-sm font-semibold text-portal-ink">#{{ $report->id }}</td>
+                                <td class="px-4 sm:px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-portal-secondary text-lg">{{ $resolveIcon($report->crimeCategory->name ?? '') }}</span>
+                                        <span class="text-sm">{{ $report->crimeCategory->name ?? '—' }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 sm:px-6 py-4 text-sm max-w-[160px] truncate">{{ $report->location_address ?? $report->crime->location ?? '—' }}</td>
+                                <td class="px-4 sm:px-6 py-4 text-sm text-portal-on-surface-variant whitespace-nowrap">{{ $report->created_at->format('M d, H:i') }}</td>
+                                <td class="px-4 sm:px-6 py-4">
                                     @if ($report->priority)
-                                        <span class="text-xs font-bold px-2 py-0.5 rounded-full"
-                                              style="background:#EAF1DD; color:#3F6B2A;">{{ $report->priority }}</span>
+                                        <span class="px-2.5 py-0.5 text-xs font-bold rounded-full uppercase {{ $priorityStyles[$report->priority] ?? 'bg-gray-100 text-gray-600' }}">
+                                            {{ $report->priority === 'Urgent' ? 'Critical' : $report->priority }}
+                                        </span>
+                                    @else
+                                        <span class="text-sm text-portal-on-surface-variant">—</span>
                                     @endif
-                                </div>
-                            </div>
-                            <div class="shrink-0 text-right">
-                                <p class="text-xs" style="color:#7B8F69;">{{ $report->created_at->format('M d, Y') }}</p>
-                                <a href="{{ route('officer.report.show', $report) }}"
-                                   class="mt-2 inline-block text-xs font-bold px-3 py-1.5 rounded-lg text-white"
-                                   style="background:#3F6B2A; text-decoration:none;">View</a>
-                            </div>
+                                </td>
+                                <td class="px-4 sm:px-6 py-4">
+                                    <span class="flex items-center gap-1.5 text-sm text-portal-on-surface-variant whitespace-nowrap">
+                                        <span class="w-2 h-2 rounded-full shrink-0 {{ $statusDots[$report->status] ?? 'bg-gray-400' }}"></span>
+                                        {{ $report->status }}
+                                    </span>
+                                </td>
+                                <td class="px-4 sm:px-6 py-4 text-right">
+                                    <a href="{{ route('officer.report.show', $report) }}"
+                                       class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-semibold text-white bg-portal-secondary hover:bg-portal-ink transition-colors no-underline">
+                                        <span class="material-symbols-outlined text-base">visibility</span>
+                                        <span class="hidden sm:inline">View</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center text-sm text-portal-on-surface-variant">
+                                    {{ Auth::user()->isOfficer() ? 'No cases have been assigned to you yet.' : 'No reports match your filters.' }}
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if ($reports->hasPages())
+                <div class="px-4 sm:px-6 py-4 bg-portal-surface border-t border-portal-outline-variant flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <span class="text-xs text-portal-on-surface-variant">
+                        Showing {{ $reports->firstItem() }} to {{ $reports->lastItem() }} of {{ $reports->total() }} entries
+                    </span>
+                    <div>{{ $reports->links() }}</div>
+                </div>
+            @endif
+        </div>
+
+        {{-- Map + Priority bento --}}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 h-72 sm:h-80 rounded-lg border border-portal-outline-variant overflow-hidden relative shadow-sm bg-slate-200">
+                <div
+                    id="incident-map-preview"
+                    data-officer-map
+                    data-marker-style="circle"
+                    data-zoom-control="false"
+                    data-map-markers='@json($mapMarkers)'
+                    class="absolute inset-0 z-[1]"
+                ></div>
+                <div class="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg border border-portal-outline-variant">
+                    <p class="text-xs font-bold text-portal-ink m-0">Live Incident Map Overlay</p>
+                </div>
+                <div class="absolute bottom-4 right-4 z-10 flex gap-2">
+                    <a href="{{ route('officer.map') }}" class="bg-portal-ink text-white p-2 rounded-full shadow-lg hover:scale-105 transition-transform no-underline" title="Open full map">
+                        <span class="material-symbols-outlined">open_in_full</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-portal-ink text-white p-5 sm:p-6 rounded-lg flex flex-col justify-between shadow-lg min-h-[280px]">
+                <div>
+                    <h3 class="text-xl font-bold m-0 mb-2">Priority Summary</h3>
+                    <p class="text-sm text-white/80 m-0 mb-6">Real-time breakdown of alerts requiring attention.</p>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold uppercase tracking-widest text-white/70">Critical</span>
+                            <span class="text-2xl font-bold">{{ $prioritySummary['critical'] }}</span>
+                        </div>
+                        <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                            @php $critPct = $prioritySummary['total'] > 0 ? min(100, round(($prioritySummary['critical'] / $prioritySummary['total']) * 100)) : 0; @endphp
+                            <div class="bg-red-500 h-full" style="width: {{ max($critPct, $prioritySummary['critical'] > 0 ? 8 : 0) }}%"></div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold uppercase tracking-widest text-white/70">High Response</span>
+                            <span class="text-2xl font-bold">{{ $prioritySummary['high'] }}</span>
+                        </div>
+                        <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                            @php $highPct = $prioritySummary['total'] > 0 ? min(100, round(($prioritySummary['high'] / $prioritySummary['total']) * 100)) : 0; @endphp
+                            <div class="bg-orange-400 h-full" style="width: {{ max($highPct, $prioritySummary['high'] > 0 ? 8 : 0) }}%"></div>
                         </div>
                     </div>
-                @endforeach
-            </div>
-
-            {{-- Desktop: Table --}}
-            <div class="hidden sm:block overflow-hidden rounded-2xl border bg-white shadow-sm" style="border-color:rgba(94,139,61,0.15);">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y" style="border-color:rgba(94,139,61,0.08);" id="reports-table">
-                        <thead style="background:#FAFBF7;">
-                            <tr>
-                                <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider" style="color:#5F6B57;">ID</th>
-                                <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider" style="color:#5F6B57;">Reporter</th>
-                                <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider" style="color:#5F6B57;">Category</th>
-                                <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider" style="color:#5F6B57;">Status</th>
-                                <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider" style="color:#5F6B57;">Priority</th>
-                                <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider" style="color:#5F6B57;">Date</th>
-                                <th class="px-5 py-3"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y" style="border-color:rgba(94,139,61,0.06);">
-                            @foreach ($reports as $report)
-                                <tr class="report-row hover:bg-[#F6F8F1] transition" data-status="{{ $report->status }}">
-                                    <td class="px-5 py-3 text-sm font-bold" style="color:#1F3318;">#{{ $report->id }}</td>
-                                    <td class="px-5 py-3 text-sm" style="color:#3A4233;">{{ $report->user->name ?? 'Anonymous' }}</td>
-                                    <td class="px-5 py-3 text-sm font-semibold" style="color:#3F6B2A;">{{ $report->crimeCategory->name ?? '—' }}</td>
-                                    <td class="px-5 py-3">@include('partials.status-badge', ['status' => $report->status])</td>
-                                    <td class="px-5 py-3 text-sm font-semibold" style="color:#3A4233;">{{ $report->priority ?? '—' }}</td>
-                                    <td class="px-5 py-3 text-sm" style="color:#7B8F69;">{{ $report->created_at->format('M d, Y') }}</td>
-                                    <td class="px-5 py-3 text-right">
-                                        <a href="{{ route('officer.report.show', $report) }}"
-                                           class="text-xs font-bold px-3 py-1.5 rounded-lg text-white transition"
-                                           style="background:#3F6B2A; text-decoration:none;">View</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
                 </div>
+                <a href="{{ route('officer.reports', ['priority' => 'Urgent']) }}"
+                   class="mt-6 py-3 bg-portal-secondary-container text-portal-on-secondary-container font-bold rounded-lg hover:bg-white transition-colors text-center text-sm no-underline block">
+                    View Critical Reports
+                </a>
             </div>
         </div>
     </div>
-
-    @push('scripts')
-        <script>
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const filter = btn.dataset.filter;
-                    // Update button styles
-                    document.querySelectorAll('.filter-btn').forEach(b => {
-                        b.style.background = b === btn ? '#3F6B2A' : '#EAF1DD';
-                        b.style.color = b === btn ? 'white' : '#3F6B2A';
-                    });
-                    // Filter table rows
-                    document.querySelectorAll('#reports-table .report-row').forEach(row => {
-                        row.style.display = (filter === 'all' || row.dataset.status === filter) ? '' : 'none';
-                    });
-                    // Filter mobile cards
-                    document.querySelectorAll('#report-cards .report-row').forEach(card => {
-                        card.style.display = (filter === 'all' || card.dataset.status === filter) ? '' : 'none';
-                    });
-                });
-            });
-        </script>
-    @endpush
-</x-app-layout>
+</x-officer-admin-layout>

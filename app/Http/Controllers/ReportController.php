@@ -8,7 +8,6 @@ use App\Models\Report;
 use App\Rules\SafeEvidenceFile;
 use App\Services\CitizenNotificationService;
 use App\Services\SecureEvidenceUploader;
-use App\Support\PhoneNumber;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -47,39 +46,35 @@ class ReportController extends Controller
 
     public function storeAnonymous(Request $request): RedirectResponse
     {
-        $request->merge([
-            'reporter_phone' => PhoneNumber::stripSpaces((string) $request->input('reporter_phone', '')),
-        ]);
-
         $validated = $request->validate([
-            'crime_id'       => 'required|exists:crime,crime_id',
-            'description'    => 'required|min:20',
-            'reporter_phone' => PhoneNumber::validationRules(),
-            'evidence'       => 'nullable|array',
-            'evidence.*'     => ['nullable', 'file', 'max:20480', new SafeEvidenceFile(allowVideo: false)],
-        ], [
-            'reporter_phone.required' => 'A phone number is required to receive your tracking code by SMS.',
-            'reporter_phone.regex'    => 'Enter a valid Ugandan mobile number (e.g. 0712345678 or +256712345678).',
+            'crime_id'           => 'required|exists:crime,crime_id',
+            'description'        => 'required|min:20',
+            'location_latitude'  => 'required|numeric|between:-90,90',
+            'location_longitude' => 'required|numeric|between:-180,180',
+            'location_name'      => 'nullable|string|max:255',
+            'evidence'             => 'nullable|array',
+            'evidence.*'           => ['nullable', 'file', 'max:20480', new SafeEvidenceFile(allowVideo: false)],
         ]);
 
         $trackingCode = $this->generateTrackingCode();
 
         $report = Report::create([
-            'crime_id'       => $validated['crime_id'],
-            'description'    => $validated['description'],
-            'stuff_id'       => null,
-            'tracking_code'  => $trackingCode,
-            'reporter_phone' => PhoneNumber::normalize($validated['reporter_phone']),
-            'status'         => 'Submitted',
+            'crime_id'           => $validated['crime_id'],
+            'description'        => $validated['description'],
+            'location_address'   => $validated['location_name'] ?? null,
+            'location_latitude'  => $validated['location_latitude'],
+            'location_longitude' => $validated['location_longitude'],
+            'stuff_id'           => null,
+            'tracking_code'      => $trackingCode,
+            'status'             => 'Submitted',
         ]);
 
         $this->storeEvidenceFiles($report, $request->file('evidence', []), allowVideo: false);
 
-        $delivery = $this->notifications->notifyReportSubmitted($report);
-
-        return redirect()->route('home')->with(
-            $this->submittedFlashPayload($trackingCode, $delivery, anonymous: true)
-        );
+        return redirect()->route('home')->with([
+            'success'       => "Anonymous report submitted! Save your tracking code to check case status later.",
+            'tracking_code' => $trackingCode,
+        ]);
     }
 
     public function create(): View
@@ -92,10 +87,13 @@ class ReportController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'crime_id'    => 'required|exists:crime,crime_id',
-            'description' => 'required|min:20',
-            'evidence'    => 'nullable|array',
-            'evidence.*'  => ['nullable', 'file', 'max:20480', new SafeEvidenceFile(allowVideo: true)],
+            'crime_id'           => 'required|exists:crime,crime_id',
+            'description'        => 'required|min:20',
+            'location_latitude'  => 'required|numeric|between:-90,90',
+            'location_longitude' => 'required|numeric|between:-180,180',
+            'location_address'   => 'nullable|string|max:255',
+            'evidence'           => 'nullable|array',
+            'evidence.*'         => ['nullable', 'file', 'max:20480', new SafeEvidenceFile(allowVideo: true)],
         ]);
 
         $report = Report::create([
@@ -107,11 +105,11 @@ class ReportController extends Controller
 
         $this->storeEvidenceFiles($report, $request->file('evidence', []), allowVideo: true);
 
-        $delivery = $this->notifications->notifyReportSubmitted($report);
+        $emailSent = $this->notifications->notifyReportSubmitted($report);
 
         return redirect()
             ->route('citizen.report.show', $report->report_id)
-            ->with($this->submittedFlashPayload($report->tracking_code, $delivery, anonymous: false));
+            ->with($this->submittedFlashPayload($report->tracking_code, $emailSent));
     }
 
     public function show(Report $report): View
@@ -147,39 +145,18 @@ class ReportController extends Controller
         return strtoupper(substr(md5(uniqid((string) mt_rand(), true)), 0, 10));
     }
 
-    /**
-     * @param  array{sms_sent: bool, email_sent: bool, has_phone: bool, has_email: bool}  $delivery
-     * @return array<string, string>
-     */
-    private function submittedFlashPayload(string $trackingCode, array $delivery, bool $anonymous): array
+    /** @return array<string, string> */
+    private function submittedFlashPayload(string $trackingCode, bool $emailSent): array
     {
-        $prefix = $anonymous
-            ? 'Anonymous report submitted!'
-            : 'Report submitted successfully!';
-
         $payload = ['tracking_code' => $trackingCode];
 
-        if ($delivery['sms_sent'] && $delivery['email_sent']) {
-            $payload['success'] = "{$prefix} Your tracking code is {$trackingCode}. A copy was sent to your phone and email.";
+        if ($emailSent) {
+            $payload['success'] = "Report submitted successfully! Your tracking code is {$trackingCode}. A copy was sent to your email.";
 
             return $payload;
         }
 
-        if ($delivery['sms_sent']) {
-            $payload['success'] = "{$prefix} Your tracking code is {$trackingCode}. A copy was sent to your phone.";
-
-            return $payload;
-        }
-
-        if ($delivery['email_sent']) {
-            $payload['success'] = "{$prefix} Your tracking code is {$trackingCode}. A copy was sent to your email.";
-
-            return $payload;
-        }
-
-        $payload['warning'] = "{$prefix} Your tracking code is {$trackingCode}. We could not deliver it by SMS"
-            .($delivery['has_email'] ? ' or email' : '')
-            .' — please save the code below.';
+        $payload['warning'] = "Report submitted successfully! Your tracking code is {$trackingCode}. We could not send a confirmation email — please save the code below.";
 
         return $payload;
     }

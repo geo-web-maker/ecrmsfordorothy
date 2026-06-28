@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Mail\WelcomeUser;
 use App\Models\Stuff;
 use App\Models\Whistleblower;
-use App\Support\PhoneNumber;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,21 +33,11 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->merge([
-            'phone_number' => PhoneNumber::stripSpaces((string) $request->input('phone_number', '')),
-        ]);
-
         $validated = $request->validate([
-            'name'         => ['required', 'string', 'max:255'],
-            'email'        => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Stuff::class],
-            'phone_number' => PhoneNumber::validationRules(),
-            'password'     => ['required', 'confirmed', Rules\Password::defaults()],
-        ], [
-            'phone_number.required' => 'A phone number is required for SMS tracking updates.',
-            'phone_number.regex'    => 'Enter a valid Ugandan mobile number (e.g. 0712345678 or +256712345678).',
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.Stuff::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-
-        $validated['phone_number'] = PhoneNumber::normalize($validated['phone_number']);
 
         $nameParts = preg_split('/\s+/', trim($validated['name']), 2);
         $firstName = $nameParts[0];
@@ -66,7 +55,6 @@ class RegisteredUserController extends Controller
                 'stuff_id'          => $stuff->stuff_id,
                 'first_name'        => $firstName,
                 'last_name'         => $lastName,
-                'phone_number'      => $validated['phone_number'],
                 'registration_date' => now()->toDateString(),
                 'is_anonymous'      => false,
             ]);

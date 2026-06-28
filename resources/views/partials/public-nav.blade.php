@@ -2,6 +2,10 @@
     $systemFullName = 'Environmental Crime Reporting & Monitoring System';
 @endphp
 
+@once
+    @vite(['resources/css/welcome-effects.css', 'resources/js/public-nav-effects.js'])
+@endonce
+
 <style>
     .public-mobile-drawer {
         background-color: #ffffff !important;
@@ -22,6 +26,40 @@
         overflow: hidden;
     }
     [x-cloak] { display: none !important; }
+
+    @keyframes attractRegister {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(94,139,61,0.4); }
+        50% { transform: scale(1.05); box-shadow: 0 0 20px 5px rgba(94,139,61,0.3); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(94,139,61,0); }
+    }
+
+    .register-btn {
+        animation: attractRegister 2.5s ease-in-out infinite;
+    }
+
+    .register-btn:hover {
+        animation-play-state: paused;
+    }
+
+    @keyframes shakeNudge {
+        0%, 100% { transform: translateX(0); }
+        10% { transform: translateX(-6px); }
+        20% { transform: translateX(6px); }
+        30% { transform: translateX(-6px); }
+        40% { transform: translateX(6px); }
+        50% { transform: translateX(-3px); }
+        60% { transform: translateX(3px); }
+        70% { transform: translateX(0); }
+    }
+
+    .navbar-logo {
+        animation: shakeNudge 3.5s ease-in-out infinite;
+        display: inline-flex;
+    }
+
+    .navbar-logo:hover {
+        animation: none;
+    }
 </style>
 
 <div
@@ -31,11 +69,13 @@
     class="public-nav-shell relative z-[10000]"
 >
     <header
-        class="fixed top-0 left-0 w-full z-[10000] transition-all duration-300"
+        id="public-nav-header"
+        class="public-nav-header fixed top-0 left-0 w-full z-[10000] transition-all duration-300"
         style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(18px); border-bottom: 1px solid rgba(94, 139, 61, 0.15); box-shadow: 0 1px 3px rgba(0,0,0,0.1);"
     >
         <div class="max-w-screen-xl mx-auto flex items-center justify-between gap-4 px-5 sm:px-8 py-3">
-            <a href="{{ route('home') }}" class="flex items-center gap-2 no-underline font-extrabold text-lg text-gray-900 tracking-tight min-w-0">
+            <a href="{{ route('home') }}" class="navbar-logo flex items-center gap-2 no-underline font-extrabold text-lg text-gray-900 tracking-tight min-w-0">
+                <span class="logo-pip" aria-hidden="true"></span>
                 <span class="text-xl flex-shrink-0" aria-hidden="true">🌿</span>
                 <span class="hidden md:inline">NEMA <span class="text-[#5E8B3D]">eCRMS</span></span>
                 <span class="md:hidden min-w-0">
@@ -59,7 +99,7 @@
                     </form>
                 @else
                     <a href="{{ route('login') }}" class="no-underline text-gray-600 font-semibold text-sm transition-colors hover:text-[#5E8B3D] {{ request()->routeIs('login') ? 'text-[#5E8B3D]' : '' }}">Log in</a>
-                    <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-5 py-2 rounded-full font-semibold text-sm no-underline bg-[#5E8B3D] text-white border-2 border-[#5E8B3D] transition-all hover:bg-[#3F6B2A] {{ request()->routeIs('register') ? 'ring-2 ring-[#5E8B3D]/30' : '' }}">Register</a>
+                    <a href="{{ route('register') }}" class="register-btn inline-flex items-center justify-center px-5 py-2 rounded-full font-semibold text-sm no-underline bg-[#5E8B3D] text-white border-2 border-[#5E8B3D] transition-all hover:bg-[#3F6B2A] {{ request()->routeIs('register') ? 'ring-2 ring-[#5E8B3D]/30' : '' }}">Register</a>
                 @endauth
             </div>
 
@@ -142,3 +182,5 @@
 </div>
 
 <div class="h-[56px] md:h-[52px]" aria-hidden="true"></div>
+
+@include('partials.logout-confirm')

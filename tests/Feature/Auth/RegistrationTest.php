@@ -27,7 +27,6 @@ class RegistrationTest extends TestCase
         $response = $this->post('/register', [
             'name' => 'Jane Nakato',
             'email' => 'test@example.com',
-            'phone_number' => '0712345678',
             'password' => 'password',
             'password_confirmation' => 'password',
         ]);
@@ -43,7 +42,6 @@ class RegistrationTest extends TestCase
             'stuff_id' => $stuff->stuff_id,
             'first_name' => 'Jane',
             'last_name' => 'Nakato',
-            'phone_number' => '+256712345678',
         ]);
 
         $this->assertInstanceOf(Whistleblower::class, $stuff->whistleblowerProfile);

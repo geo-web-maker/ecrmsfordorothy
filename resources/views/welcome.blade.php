@@ -7,7 +7,7 @@
     <meta name="description" content="Report environmental crimes safely and anonymously. NEMA eCRMS helps citizens protect Uganda's environment through encrypted, secure crime reporting.">
     @push('styles')
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
-        @vite(['resources/css/welcome-page.css'])
+        @vite(['resources/css/welcome-page.css', 'resources/js/welcome-effects.js'])
     @endpush
     @include('partials.optimized-head')
     <link rel="preload" as="image" href="{{ asset('images/Hero-section.jpg') }}" fetchpriority="high">
@@ -29,19 +29,21 @@
         ></div>
         <div class="absolute inset-0 z-10 welcome-hero-gradient"></div>
         <div class="relative z-20 w-full px-4 sm:px-8 lg:px-portal-margin-desktop max-w-portal-container mx-auto text-center text-white pt-8 pb-16">
-            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full mb-8 border border-white/20">
+            <div class="hero-badge-in inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full mb-8 border border-white/20">
                 <span class="material-symbols-outlined filled text-sm text-white">verified_user</span>
                 <span class="text-xs font-semibold uppercase tracking-wider">Fully Encrypted System</span>
             </div>
-            <h1 class="text-3xl sm:text-4xl md:text-portal-xl font-extrabold mb-6 max-w-4xl mx-auto flex flex-col items-center gap-2 sm:gap-3 md:gap-4">
-                <span>Safe &amp; Fully</span>
-                <span>Encrypted Reporting</span>
-            </h1>
-            <p class="text-lg sm:text-portal-md font-medium text-white/90 mb-4">Report Environmental Crimes Safely &amp; Anonymously</p>
-            <p class="text-base sm:text-portal-body-lg text-white/80 max-w-2xl mx-auto mb-10">
-                Submit illegal logging, wetland encroachment, pollution, and other environmental violations. Track your case from report to resolution.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div class="hero-content-in">
+                <h1 class="text-3xl sm:text-4xl md:text-portal-xl font-extrabold mb-6 max-w-4xl mx-auto flex flex-col items-center gap-2 sm:gap-3 md:gap-4">
+                    <span>Safe &amp; Fully</span>
+                    <span>Encrypted Reporting</span>
+                </h1>
+                <p class="text-lg sm:text-portal-md font-medium text-white/90 mb-4">Report Environmental Crimes Safely &amp; Anonymously</p>
+                <p class="text-base sm:text-portal-body-lg text-white/80 max-w-2xl mx-auto mb-10">
+                    Submit illegal logging, wetland encroachment, pollution, and other environmental violations. Track your case from report to resolution.
+                </p>
+            </div>
+            <div class="hero-actions-in flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a href="{{ route('report.anonymous') }}" class="welcome-cta w-full sm:w-auto bg-white text-portal-ink px-10 py-4 rounded-xl text-sm font-bold shadow-xl hover:bg-portal-surface transition-all no-underline">
                     Report a Crime Now
                 </a>
@@ -52,6 +54,22 @@
         </div>
     </section>
 
+    <!-- Marquee band -->
+    <div class="welcome-marquee-wrap" aria-hidden="true">
+        <div class="welcome-marquee-track">
+            <span class="welcome-marquee-item"><span class="material-symbols-outlined welcome-marquee-icon">forest</span>Protect Uganda's forests<span class="welcome-marquee-dot">·</span></span>
+            <span class="welcome-marquee-item"><span class="material-symbols-outlined welcome-marquee-icon">water_drop</span>Report wetland encroachment<span class="welcome-marquee-dot">·</span></span>
+            <span class="welcome-marquee-item"><span class="material-symbols-outlined welcome-marquee-icon">park</span>Stop illegal logging<span class="welcome-marquee-dot">·</span></span>
+            <span class="welcome-marquee-item"><span class="material-symbols-outlined welcome-marquee-icon">lock</span>Secure anonymous reporting<span class="welcome-marquee-dot">·</span></span>
+            <span class="welcome-marquee-item"><span class="material-symbols-outlined welcome-marquee-icon">verified</span>NEMA verified enforcement<span class="welcome-marquee-dot">·</span></span>
+            <span class="welcome-marquee-item"><span class="material-symbols-outlined welcome-marquee-icon">forest</span>Protect Uganda's forests<span class="welcome-marquee-dot">·</span></span>
+            <span class="welcome-marquee-item"><span class="material-symbols-outlined welcome-marquee-icon">water_drop</span>Report wetland encroachment<span class="welcome-marquee-dot">·</span></span>
+            <span class="welcome-marquee-item"><span class="material-symbols-outlined welcome-marquee-icon">park</span>Stop illegal logging<span class="welcome-marquee-dot">·</span></span>
+            <span class="welcome-marquee-item"><span class="material-symbols-outlined welcome-marquee-icon">lock</span>Secure anonymous reporting<span class="welcome-marquee-dot">·</span></span>
+            <span class="welcome-marquee-item"><span class="material-symbols-outlined welcome-marquee-icon">verified</span>NEMA verified enforcement<span class="welcome-marquee-dot">·</span></span>
+        </div>
+    </div>
+
     <!-- Flash Messages -->
     <div class="max-w-portal-container mx-auto px-4 sm:px-8 lg:px-portal-margin-desktop -mt-6 relative z-30">
         @include('partials.flash')
@@ -60,35 +78,35 @@
     <!-- System Features -->
     <section class="py-16 sm:py-24 bg-portal-surface px-4 sm:px-8 lg:px-portal-margin-desktop">
         <div class="max-w-portal-container mx-auto">
-            <div class="text-center mb-12 sm:mb-16 welcome-reveal">
+            <div class="text-center mb-12 sm:mb-16" data-reveal>
                 <h2 class="text-2xl sm:text-portal-lg text-portal-ink font-bold mb-4">System Features</h2>
                 <p class="text-base sm:text-portal-body-lg text-portal-on-surface-variant max-w-2xl mx-auto">
                     Designed with absolute security and a simple workflow to empower citizens and fast-track environmental protection.
                 </p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-                <div class="welcome-bento-card welcome-reveal bg-white p-8 rounded-xl border border-portal-outline-variant flex flex-col items-start h-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8" data-stagger>
+                <div class="welcome-bento-card bg-white p-8 rounded-xl border border-portal-outline-variant flex flex-col items-start h-full">
                     <div class="w-14 h-14 bg-portal-leaf-tint rounded-lg flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-portal-secondary text-portal-md">inventory_2</span>
                     </div>
                     <h3 class="text-portal-md text-portal-ink font-semibold mb-3">Submit with Evidence</h3>
                     <p class="text-sm sm:text-base text-portal-on-surface-variant leading-relaxed">Easily upload photos, coordinates, videos, and full descriptions of the violation.</p>
                 </div>
-                <div class="welcome-bento-card welcome-reveal bg-white p-8 rounded-xl border border-portal-outline-variant flex flex-col items-start h-full">
+                <div class="welcome-bento-card bg-white p-8 rounded-xl border border-portal-outline-variant flex flex-col items-start h-full">
                     <div class="w-14 h-14 bg-portal-leaf-tint rounded-lg flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-portal-secondary text-portal-md">lock</span>
                     </div>
                     <h3 class="text-portal-md text-portal-ink font-semibold mb-3">Anonymous Tracking</h3>
                     <p class="text-sm sm:text-base text-portal-on-surface-variant leading-relaxed">Never worry about safety. Get a fully secure, hash-generated tracking code to monitor progress.</p>
                 </div>
-                <div class="welcome-bento-card welcome-reveal bg-white p-8 rounded-xl border border-portal-outline-variant flex flex-col items-start h-full">
+                <div class="welcome-bento-card bg-white p-8 rounded-xl border border-portal-outline-variant flex flex-col items-start h-full">
                     <div class="w-14 h-14 bg-portal-leaf-tint rounded-lg flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-portal-secondary text-portal-md">verified</span>
                     </div>
                     <h3 class="text-portal-md text-portal-ink font-semibold mb-3">NEMA Verified</h3>
                     <p class="text-sm sm:text-base text-portal-on-surface-variant leading-relaxed">Reports are forwarded instantly to regional enforcement and environment field teams.</p>
                 </div>
-                <div class="welcome-bento-card welcome-reveal bg-white p-8 rounded-xl border border-portal-outline-variant flex flex-col items-start h-full">
+                <div class="welcome-bento-card bg-white p-8 rounded-xl border border-portal-outline-variant flex flex-col items-start h-full">
                     <div class="w-14 h-14 bg-portal-leaf-tint rounded-lg flex items-center justify-center mb-6">
                         <span class="material-symbols-outlined text-portal-secondary text-portal-md">notifications</span>
                     </div>
@@ -103,14 +121,14 @@
     <section class="py-16 sm:py-24 bg-white px-4 sm:px-8 lg:px-portal-margin-desktop overflow-hidden">
         <div class="max-w-portal-container mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             <div class="lg:col-span-6 space-y-8 sm:space-y-12">
-                <div class="welcome-reveal">
+                <div data-reveal="left">
                     <h2 class="text-2xl sm:text-portal-lg text-portal-ink font-bold mb-6">Why Report Through NEMA eCRMS?</h2>
                     <p class="text-base sm:text-portal-body-lg text-portal-on-surface-variant">
                         Join citizens protecting Uganda's environment. Every report helps stop illegal logging, wetland destruction, and pollution.
                     </p>
                 </div>
                 <div class="space-y-4 sm:space-y-6">
-                    <div class="welcome-reveal flex items-start gap-4 sm:gap-6 p-5 sm:p-6 rounded-xl border border-portal-outline-variant bg-portal-surface-bright hover:border-portal-secondary transition-colors">
+                    <div data-reveal="left" class="flex items-start gap-4 sm:gap-6 p-5 sm:p-6 rounded-xl border border-portal-outline-variant bg-portal-surface-bright hover:border-portal-secondary transition-colors">
                         <div class="mt-1 w-8 h-8 bg-portal-secondary-container text-portal-on-secondary-container rounded-full flex items-center justify-center shrink-0">
                             <span class="material-symbols-outlined filled text-base">check</span>
                         </div>
@@ -119,7 +137,7 @@
                             <p class="text-sm text-portal-on-surface-variant">We use encryption protocols to scrub metadata from your uploads and files.</p>
                         </div>
                     </div>
-                    <div class="welcome-reveal flex items-start gap-4 sm:gap-6 p-5 sm:p-6 rounded-xl border border-portal-outline-variant bg-portal-surface-bright hover:border-portal-secondary transition-colors">
+                    <div data-reveal="left" class="flex items-start gap-4 sm:gap-6 p-5 sm:p-6 rounded-xl border border-portal-outline-variant bg-portal-surface-bright hover:border-portal-secondary transition-colors">
                         <div class="mt-1 w-8 h-8 bg-portal-secondary-container text-portal-on-secondary-container rounded-full flex items-center justify-center shrink-0">
                             <span class="material-symbols-outlined filled text-base">check</span>
                         </div>
@@ -128,7 +146,7 @@
                             <p class="text-sm text-portal-on-surface-variant">Automatically alerts the closest local authority or NEMA forest ranger unit.</p>
                         </div>
                     </div>
-                    <div class="welcome-reveal flex items-start gap-4 sm:gap-6 p-5 sm:p-6 rounded-xl border border-portal-outline-variant bg-portal-surface-bright hover:border-portal-secondary transition-colors">
+                    <div data-reveal="left" class="flex items-start gap-4 sm:gap-6 p-5 sm:p-6 rounded-xl border border-portal-outline-variant bg-portal-surface-bright hover:border-portal-secondary transition-colors">
                         <div class="mt-1 w-8 h-8 bg-portal-secondary-container text-portal-on-secondary-container rounded-full flex items-center justify-center shrink-0">
                             <span class="material-symbols-outlined filled text-base">check</span>
                         </div>
@@ -139,7 +157,7 @@
                     </div>
                 </div>
             </div>
-            <div class="lg:col-span-6">
+            <div class="lg:col-span-6" data-reveal="right">
                 <div class="welcome-live-feed bg-portal-container p-6 sm:p-8 rounded-3xl shadow-2xl text-white relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
                     <div class="flex justify-between items-start mb-8 sm:mb-10 gap-4">
@@ -186,7 +204,7 @@
                             </div>
                         </div>
                         <div class="flex gap-4">
-                            <div class="w-6 h-6 border-2 border-portal-secondary-fixed text-portal-secondary-fixed rounded-full flex items-center justify-center shrink-0">
+                            <div class="feed-step-pulse w-6 h-6 border-2 border-portal-secondary-fixed text-portal-secondary-fixed rounded-full flex items-center justify-center shrink-0">
                                 <span class="w-2 h-2 bg-portal-secondary-fixed rounded-full"></span>
                             </div>
                             <div>
@@ -213,16 +231,16 @@
             <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[60%] bg-portal-leaf-tint blur-[120px] rounded-full"></div>
             <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-portal-secondary blur-[120px] rounded-full"></div>
         </div>
-        <div class="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-portal-margin-mobile welcome-reveal">
+        <div class="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-portal-margin-mobile" data-reveal="scale">
             <h2 class="text-2xl sm:text-portal-lg font-bold mb-6">Ready to Protect Uganda's Natural Heritage?</h2>
             <p class="text-base sm:text-portal-body-lg text-white/80 mb-10 sm:mb-12">
                 Your contribution as a whistleblower is vital. Join thousands of citizens who are already helping NEMA monitor and protect our environment through the eCRMS portal.
             </p>
-            <div class="flex flex-col md:flex-row justify-center gap-4 sm:gap-6">
-                <a href="{{ route('report.anonymous') }}" class="welcome-cta bg-portal-secondary-fixed text-portal-ink px-10 sm:px-12 py-4 sm:py-5 rounded-xl text-portal-md font-bold shadow-lg hover:scale-105 active:scale-95 transition-all no-underline">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="{{ route('report.anonymous') }}" class="welcome-cta w-full sm:w-auto bg-portal-secondary-fixed text-portal-ink px-10 py-4 rounded-xl text-sm font-bold shadow-lg hover:bg-portal-secondary transition-all no-underline">
                     Report a Crime Now
                 </a>
-                <a href="mailto:ecrms@nema.go.ug" class="welcome-cta bg-white/10 backdrop-blur-md border border-white/20 text-white px-10 sm:px-12 py-4 sm:py-5 rounded-xl text-portal-md font-bold hover:bg-white/20 transition-all no-underline">
+                <a href="mailto:ecrms@nema.go.ug" class="welcome-cta w-full sm:w-auto bg-white/10 backdrop-blur-md border border-white/20 text-white px-10 py-4 rounded-xl text-sm font-bold hover:bg-white/20 transition-all no-underline">
                     Contact Inspectorate
                 </a>
             </div>
@@ -294,24 +312,5 @@
 
 </div>
 
-<script defer>
-    document.addEventListener('DOMContentLoaded', () => {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (!entry.isIntersecting) return;
-                entry.target.classList.add('opacity-100', 'translate-y-0');
-                entry.target.classList.remove('opacity-0', 'translate-y-8');
-                observer.unobserve(entry.target);
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.welcome-reveal, .welcome-bento-card').forEach((el) => {
-            el.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-8');
-            observer.observe(el);
-        });
-    });
-</script>
 </body>
 </html>

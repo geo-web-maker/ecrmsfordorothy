@@ -48,7 +48,62 @@
                     </a>
                 </div>
             @else
-                <div class="overflow-hidden rounded-2xl border bg-white shadow-sm" style="border-color:rgba(94,139,61,0.15);">
+                {{-- Mobile: vertical card list --}}
+                <div class="md:hidden flex flex-col gap-4">
+                    @foreach ($reports as $report)
+                        @php
+                            $priorityStyles = match (strtolower($report->priority ?? '')) {
+                                'critical' => 'background:#FDF2F2; color:#9B1C1C; border:1px solid #FBD5D5;',
+                                'high' => 'background:#FFF8F1; color:#B45309; border:1px solid #FEE2E2;',
+                                'medium' => 'background:#FFFBEB; color:#B45309; border:1px solid #FEF3C7;',
+                                default => 'background:#EAF1DD; color:#3F6B2A; border:1px solid #D9E8C5;',
+                            };
+                        @endphp
+                        <article class="rounded-2xl border bg-white p-4 shadow-sm" style="border-color:rgba(94,139,61,0.15);">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div>
+                                    <p class="text-xs font-bold uppercase tracking-wider m-0" style="color:#7B8F69;">Report</p>
+                                    <h3 class="text-lg font-bold m-0 mt-0.5" style="color:#1F3318;">#{{ $report->id }}</h3>
+                                </div>
+                                @include('partials.status-badge', ['status' => $report->status])
+                            </div>
+
+                            <dl class="grid grid-cols-1 gap-3 text-sm mb-4">
+                                <div>
+                                    <dt class="text-[10px] font-bold uppercase tracking-wider" style="color:#7B8F69;">Category</dt>
+                                    <dd class="font-semibold mt-0.5 m-0" style="color:#3F6B2A;">{{ $report->crimeCategory->name ?? '—' }}</dd>
+                                </div>
+                                <div class="flex items-center justify-between gap-3">
+                                    <div>
+                                        <dt class="text-[10px] font-bold uppercase tracking-wider" style="color:#7B8F69;">Priority</dt>
+                                        <dd class="mt-1 m-0">
+                                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold capitalize" style="{{ $priorityStyles }}">
+                                                {{ $report->priority }}
+                                            </span>
+                                        </dd>
+                                    </div>
+                                    <div class="text-right">
+                                        <dt class="text-[10px] font-bold uppercase tracking-wider" style="color:#7B8F69;">Submitted</dt>
+                                        <dd class="font-medium mt-0.5 m-0" style="color:#7B8F69;">{{ $report->created_at->format('M d, Y') }}</dd>
+                                    </div>
+                                </div>
+                            </dl>
+
+                            <button type="button"
+                                    onclick="openReportModal({{ $report->id }})"
+                                    class="w-full inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-xl text-sm font-bold text-white transition-all shadow-sm cursor-pointer border-none"
+                                    style="background:#3F6B2A;">
+                                View Details
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 0 1 0-1.06L11.94 8H6.75a.75.75 0 0 1 0-1.5h6.5a.75.75 0 0 1 .75.75v6.5a.75.75 0 0 1-1.5 0V8.81l-4.73 4.73a.75.75 0 0 1-1.06 0z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </article>
+                    @endforeach
+                </div>
+
+                {{-- Desktop: table --}}
+                <div class="hidden md:block overflow-hidden rounded-2xl border bg-white shadow-sm" style="border-color:rgba(94,139,61,0.15);">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-[#EDF0E5]">
                             <thead style="background:#FAFBF7;">
@@ -116,7 +171,7 @@
             @endphp
             <!-- Modal for Report #{{ $report->id }} -->
             <div id="report-modal-{{ $report->id }}" 
-                 class="report-modal-backdrop hidden-state fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                 class="report-modal-backdrop hidden-state fixed inset-0 z-[15000] flex items-center justify-center p-4 pt-20 sm:pt-4 bg-black/60 backdrop-blur-sm"
                  onclick="closeReportModal({{ $report->id }})">
                 
                 <div class="report-modal-content hidden-state bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border"
