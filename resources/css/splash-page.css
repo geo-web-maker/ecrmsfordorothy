@@ -18,14 +18,69 @@
 
 .splash-screen {
     min-height: 100dvh;
+    min-height: 100svh;
     background-color: #012d1d;
     cursor: pointer;
     font-family: Inter, system-ui, -apple-system, sans-serif;
 }
 
+.splash-layout {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100dvh;
+    min-height: 100svh;
+    width: 100%;
+    max-width: 100%;
+    padding:
+        max(1.25rem, env(safe-area-inset-top))
+        max(1rem, env(safe-area-inset-right))
+        max(1.25rem, env(safe-area-inset-bottom))
+        max(1rem, env(safe-area-inset-left));
+    box-sizing: border-box;
+    gap: 1rem;
+}
+
+.splash-brand {
+    padding-top: 0.25rem;
+}
+
+.splash-loader-wrap {
+    min-height: 0;
+}
+
+.splash-footer {
+    flex-shrink: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.splash-encryption {
+    max-width: 18rem;
+    margin-inline: auto;
+}
+
 .splash-icon {
     display: block;
     flex-shrink: 0;
+}
+
+.splash-encryption-icon {
+    display: inline-block;
+}
+
+@media (min-width: 640px) {
+    .splash-layout {
+        gap: 1.5rem;
+        padding:
+            max(2rem, env(safe-area-inset-top))
+            max(2rem, env(safe-area-inset-right))
+            max(2rem, env(safe-area-inset-bottom))
+            max(2rem, env(safe-area-inset-left));
+    }
+
+    .splash-encryption {
+        max-width: none;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
