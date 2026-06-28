@@ -15,6 +15,7 @@ WORKDIR /var/www
 COPY . .
 
 # Install PHP deps
+RUN composer update league/flysystem-aws-s3-v3 --no-dev --no-interaction
 RUN composer install --no-dev --optimize-autoloader
 
 # Install JS deps and build assets
