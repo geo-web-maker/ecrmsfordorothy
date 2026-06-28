@@ -3,6 +3,7 @@ FROM php:8.2-fpm-alpine
 # Install system deps
 RUN apk add --no-cache nginx supervisor curl unzip git nodejs npm \
     libpng-dev libjpeg-turbo-dev freetype-dev \
+    postgresql-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_pgsql gd opcache
 
