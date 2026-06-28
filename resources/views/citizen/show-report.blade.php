@@ -75,7 +75,7 @@
                             <div class="rounded-xl border overflow-hidden" style="border-color:rgba(94,139,61,0.12);">
                                 @if ($item->file_type === 'image')
                                     <x-lazy-image
-                                        :src="asset('storage/'.$item->file_path)"
+                                        :src="Storage::url($item->file_path)"
                                         alt="Evidence"
                                         class="h-28 sm:h-36 w-full object-cover"
                                         height="9rem"
@@ -83,7 +83,7 @@
                                 @else
                                     <div class="lazy-media" data-lazy-media style="min-height: 9rem;">
                                         <div class="lazy-media__skeleton skeleton skeleton-shimmer" aria-hidden="true"></div>
-                                        <video src="{{ asset('storage/'.$item->file_path) }}" controls preload="none" class="lazy-media__video h-28 sm:h-36 w-full object-cover"></video>
+                                        <video src="{{ Storage::url($item->file_path) }}" controls preload="none" class="lazy-media__video h-28 sm:h-36 w-full object-cover"></video>
                                     </div>
                                 @endif
                             </div>
