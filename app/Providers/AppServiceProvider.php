@@ -25,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
             if ($user = auth()->user()) {
                 $user->loadMissing(['whistleblowerProfile', 'officerProfile', 'adminProfile']);
             }
+            if (config('app.env') === 'production') {
+                \URL::forceScheme('https');
+            }
         });
 
         $verifySsl = filter_var(config('services.http.verify_ssl', true), FILTER_VALIDATE_BOOLEAN);
